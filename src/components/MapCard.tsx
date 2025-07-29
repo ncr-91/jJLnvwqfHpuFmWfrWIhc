@@ -49,13 +49,6 @@ const stateFullNames: Record<string, string> = {
   National: "National",
 };
 
-type CsvRow = { state: keyof typeof stateLabelPositions; value: string };
-type LegendEntry = {
-  state: keyof typeof stateLabelPositions;
-  value: string;
-  color: string;
-};
-
 const MapCard: React.FC<MapCardProps> = ({ config }) => {
   const { data, loading } = useCsvData(config.csvUrl ?? "", "map");
 
@@ -68,7 +61,7 @@ const MapCard: React.FC<MapCardProps> = ({ config }) => {
   let customStyling: Record<string, any> = {};
   if (data && "rows" in data && Array.isArray(data.rows)) {
     type StateKey = keyof typeof stateLabelPositions;
-    data.rows.forEach((row, idx) => {
+    data.rows.forEach((row) => {
       const state = row.state as StateKey;
       const value = row.value;
       if (!state || !value || !stateLabelPositions[state]) return;
@@ -85,12 +78,6 @@ const MapCard: React.FC<MapCardProps> = ({ config }) => {
       }
     });
   }
-
-  // Find the National value in your parsed data
-  const nationalRow =
-    data && "rows" in data && Array.isArray(data.rows)
-      ? data.rows.find((row) => row.state === "National")
-      : undefined;
 
   // Prepare overlay labels data
   let overlayLabels =

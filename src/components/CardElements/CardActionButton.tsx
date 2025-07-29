@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import type { ReactNode, RefObject } from "react";
+import { useState, useRef, useEffect } from "react";
+import type { ReactNode } from "react";
 
 interface CardActionButtonProps {
   children: ReactNode | ((close: () => void) => ReactNode);

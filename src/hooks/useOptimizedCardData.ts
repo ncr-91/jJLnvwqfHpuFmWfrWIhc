@@ -2,14 +2,8 @@ import { useMemo } from "react";
 import { useCsvData } from "./usePrepareRawCsv";
 import { useFormattedChartData } from "./useStyleParsedCsv";
 import type { CardConfig } from "../config/cardConfigs";
-import type { ParserType } from "./types";
-import {
-  parseISO,
-  format,
-  startOfWeek,
-  startOfMonth,
-  getISOWeek,
-} from "date-fns";
+
+import { parseISO, format, startOfWeek, startOfMonth } from "date-fns";
 
 function isParsedSheetData(data: any): data is { chartData: any } {
   return data && typeof data === "object" && "chartData" in data;

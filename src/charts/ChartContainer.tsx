@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import LineChart from "./LineChart";
 import BarChart from "./BarChart";
 import PieChart from "./PieChart";
@@ -34,8 +34,7 @@ const ChartContainer = memo(
     loading,
     chartData,
     type,
-    width,
-    height,
+
     view,
     direction,
     percent,

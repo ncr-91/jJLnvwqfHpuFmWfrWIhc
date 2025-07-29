@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { useOptimizedCardData } from "../hooks/useOptimizedCardData";
 import { calculateTrendPercentage } from "../utils/utils";
 import WidgetHeader from "./CardElements/WidgetHeader";

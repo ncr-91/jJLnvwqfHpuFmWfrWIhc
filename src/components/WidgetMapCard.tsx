@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import WidgetHeader from "./CardElements/WidgetHeader";
-import TotalValue from "./CardElements/TotalSpendStat";
-import TrendPill from "./CardElements/TrendPill";
+
 import type { CardConfig } from "../config/cardConfigs";
 import { useCsvData } from "../hooks/usePrepareRawCsv";
 import { cardSizeClasses } from "../config/cardConfigs";
@@ -63,7 +62,7 @@ const WidgetMapCard: React.FC<WidgetMapCardProps> = ({ config }) => {
   let customStyling: Record<string, any> = {};
   if (data && "rows" in data && Array.isArray(data.rows)) {
     type StateKey = keyof typeof stateLabelPositions;
-    data.rows.forEach((row, idx) => {
+    data.rows.forEach((row) => {
       const state = row.state as StateKey;
       const value = row.value;
       if (!state || !value || !stateLabelPositions[state]) return;

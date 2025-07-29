@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { chartColors } from "../utils/ChartjsConfig";
 import {
   Chart,
@@ -30,7 +30,6 @@ interface PieChartProps {
 }
 
 function PieChart({
-  id,
   data,
   percent = false,
   showChartLegend = false,
@@ -40,11 +39,11 @@ function PieChart({
   showChartGridlineX = false,
   showChartGridlineY = false,
   cutout = 0,
-  stacked, // Added for compatibility but ignored
 }: PieChartProps) {
   const [chart, setChart] = useState<Chart<"pie"> | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const legend = useRef<HTMLUListElement>(null);
+  const isMounted = useRef(true);
   const { tooltipBodyColor, tooltipBgColor, tooltipBorderColor } = chartColors;
 
   useEffect(() => {
@@ -225,7 +224,11 @@ function PieChart({
     setChart(chartInstance);
     return () => {
       if (chartInstance) {
-        chartInstance.destroy();
+        try {
+          chartInstance.destroy();
+        } catch (error) {
+          console.warn("Chart destroy error:", error);
+        }
       }
     };
   }, [
@@ -241,20 +244,66 @@ function PieChart({
 
   // Force chart resize when container size changes
   useEffect(() => {
-    if (chart && canvas.current) {
+    if (chart && canvas.current && canvas.current.ownerDocument) {
       const resizeObserver = new ResizeObserver(() => {
-        if (chart) {
-          chart.resize();
-          chart.update();
+        // Check if component is still mounted and element exists
+        if (
+          !isMounted.current ||
+          !canvas.current ||
+          !canvas.current.ownerDocument
+        ) {
+          return;
+        }
+
+        if (chart && canvas.current && canvas.current.ownerDocument) {
+          try {
+            chart.resize();
+            chart.update();
+          } catch (error) {
+            console.warn("Chart resize error:", error);
+          }
         }
       });
 
       resizeObserver.observe(canvas.current);
 
       return () => {
-        resizeObserver.disconnect();
+        try {
+          resizeObserver.disconnect();
+        } catch (error) {
+          console.warn("ResizeObserver disconnect error:", error);
+        }
       };
     }
+  }, [chart]);
+
+  // Cleanup chart on unmount
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      if (chart) {
+        try {
+          chart.destroy();
+        } catch (error) {
+          console.warn("Chart cleanup error:", error);
+        }
+      }
+    };
+  }, [chart]);
+
+  // Component unmount cleanup
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      // Immediately destroy chart to prevent any further operations
+      if (chart) {
+        try {
+          chart.destroy();
+        } catch (error) {
+          console.warn("Chart unmount cleanup error:", error);
+        }
+      }
+    };
   }, [chart]);
 
   return (

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { useOptimizedTableCardData } from "../hooks/useOptimizedTableCardData";
 import CardHeader from "./CardElements/CardHeader";
 import type { CardConfig } from "../config/cardConfigs";

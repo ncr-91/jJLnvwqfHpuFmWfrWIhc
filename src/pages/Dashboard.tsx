@@ -1,4 +1,3 @@
-import React from "react";
 import { cardConfigs, cardSizeClasses } from "../config/cardConfigs";
 import type { CardConfig } from "../config/cardConfigs";
 import StatCard from "../components/StatCard";
@@ -8,7 +7,7 @@ import CreativesCard from "../components/CreativesCard";
 import WidgetCard from "../components/WidgetCard";
 import WidgetMapCard from "../components/WidgetMapCard";
 import MapCard from "../components/MapCard";
-import BrandHeader from "../components/BrandHeader";
+//import BrandHeader from "../components/BrandHeader";
 
 const cardOrder = [
   "stat01",
@@ -59,7 +58,7 @@ const Dashboard = () => (
     <div className="dashboard wrapper">
       <main className="grow">
         <section className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-          <BrandHeader />
+          {/* <BrandHeader /> */}
           <div className="grid grid-cols-12 gap-6 auto-rows-[239px]">
             {cardOrder.map((cardId) => {
               const config = configMap[cardId];

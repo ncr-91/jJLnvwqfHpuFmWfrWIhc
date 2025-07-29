@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { chartColors } from "../utils/ChartjsConfig";
 import {
   Chart,
@@ -44,7 +44,6 @@ interface BarChartStackedProps {
 }
 
 function BarChart({
-  id,
   data,
   direction = "vertical",
   percent = false,
@@ -55,13 +54,8 @@ function BarChart({
   showChartLabelsY = true,
   showChartGridlineX = false,
   showChartGridlineY = true,
-  // Legacy properties for backward compatibility
-  showBarChartLabelsX,
-  showBarChartLabelsY,
-  showBarChartGridlinesX,
-  showBarChartGridlinesY,
 }: BarChartStackedProps) {
-  const [chart, setChart] = useState<Chart<"bar"> | null>(null);
+  const [, setChart] = useState<Chart<"bar"> | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const legend = useRef<HTMLUListElement>(null);
   const { tooltipBodyColor, tooltipBgColor, tooltipBorderColor } = chartColors;
@@ -101,7 +95,7 @@ function BarChart({
 
     // Recalculate percentages based on visible datasets only
     chartInstance.data.datasets.forEach((dataset, datasetIndex) => {
-      dataset.data = dataset.data.map((value, index) => {
+      dataset.data = dataset.data.map((_, index) => {
         const originalValue = data.datasets[datasetIndex].data[index] as number;
 
         // Calculate total from visible datasets only

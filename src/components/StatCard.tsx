@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState, useCallback } from "react";
+import { memo, useMemo, useState, useCallback } from "react";
 import { useOptimizedCardData } from "../hooks/useOptimizedCardData";
 import { calculateTrendPercentage } from "../utils/utils";
 import { formatCurrency } from "../utils/utils";

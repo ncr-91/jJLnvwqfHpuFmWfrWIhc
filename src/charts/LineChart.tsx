@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { chartColors } from "../utils/ChartjsConfig.tsx";
 import {
   Chart,
@@ -12,7 +12,6 @@ import {
   CategoryScale,
   type ChartData,
   type ChartOptions,
-  type TooltipItem,
   type Plugin,
 } from "chart.js";
 import "chartjs-adapter-moment";
@@ -52,7 +51,7 @@ function LineChart({
   legendPosition = "bottom",
   showChartGridlineX = false,
   showChartGridlineY = false,
-  showLineChartGradient = false,
+
   showChartLabelsX = true,
   showChartLabelsY = true,
   xAxisType = "category",
