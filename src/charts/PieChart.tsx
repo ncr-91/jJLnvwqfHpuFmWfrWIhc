@@ -315,7 +315,7 @@ function PieChart({
       }`}
     >
       <div
-        className={`flex-1 min-h-0 max-w-full px-2 py-2 sm:px-2 sm:py-2 ${
+        className={`flex-1 min-h-0 max-w-full px-4 py-2 sm:px-4 sm:py-2 ${
           showChartLegend && legendPosition === "bottom" ? "" : "mb-0"
         }`}
       >
