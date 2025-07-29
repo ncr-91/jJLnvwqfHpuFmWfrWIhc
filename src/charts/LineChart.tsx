@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { chartColors } from "../utils/ChartjsConfig.tsx";
 import {
   Chart,
@@ -43,6 +43,7 @@ interface LineChartProps {
   xAxisType?: "category" | "time";
   view?: "daily" | "weekly" | "monthly";
   tooltipMode?: "date" | "label";
+  percent?: boolean;
 }
 
 function LineChart({
@@ -51,18 +52,50 @@ function LineChart({
   legendPosition = "bottom",
   showChartGridlineX = false,
   showChartGridlineY = false,
-
   showChartLabelsX = true,
   showChartLabelsY = true,
   xAxisType = "category",
   view = "monthly",
   tooltipMode = "date",
+  percent = false,
 }: LineChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const chartRef = useRef<Chart<"line"> | null>(null);
   const hasRendered = useRef(false);
   const { tooltipBodyColor, tooltipBgColor, tooltipBorderColor } = chartColors;
   const customLegendRef = useRef<HTMLUListElement>(null);
+
+  // Calculate percentage data if percent mode is enabled
+  const chartData = useMemo(() => {
+    if (!percent || !data.datasets || data.datasets.length === 0) {
+      return data;
+    }
+
+    const labels = data.labels || [];
+    const datasets = data.datasets;
+
+    // Calculate totals for each data point
+    const totals = labels.map((_, index) => {
+      return datasets.reduce((sum, dataset) => {
+        const value = dataset.data[index];
+        return sum + (typeof value === "number" ? value : 0);
+      }, 0);
+    });
+
+    // Convert to percentages
+    const percentageDatasets = datasets.map((dataset) => ({
+      ...dataset,
+      data: dataset.data.map((value, index) => {
+        const total = totals[index];
+        return total > 0 ? ((value as number) / total) * 100 : 0;
+      }),
+    }));
+
+    return {
+      labels,
+      datasets: percentageDatasets,
+    };
+  }, [data, percent]);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -161,7 +194,7 @@ function LineChart({
     if (!chartRef.current) {
       chartRef.current = new Chart<"line">(ctx, {
         type: "line",
-        data,
+        data: chartData,
         options: {
           animation: {
             duration: 400,
@@ -180,7 +213,12 @@ function LineChart({
               },
               ticks: {
                 maxTicksLimit: 6,
-                callback: (value) => formatValue(Number(value)),
+                callback: (value) => {
+                  if (percent) {
+                    return `${value}%`;
+                  }
+                  return formatValue(Number(value));
+                },
                 display: showChartLabelsY,
               },
               border: { display: false },
@@ -295,6 +333,20 @@ function LineChart({
                 label: (context) => {
                   const datasetLabel = context.dataset.label || "";
                   const value = formatValue(context.parsed.y);
+
+                  if (percent) {
+                    // In percentage mode, show both percentage and original value
+                    const originalValue =
+                      data.datasets[context.datasetIndex!].data[
+                        context.dataIndex!
+                      ];
+                    // Remove $ sign from percentage value
+                    const percentageValue = value.replace("$", "");
+                    return `${datasetLabel}: ${percentageValue}% (${formatValue(
+                      originalValue as number
+                    )})`;
+                  }
+
                   return `${datasetLabel}: ${value}`;
                 },
                 afterBody: (tooltipItems) => {
@@ -302,6 +354,13 @@ function LineChart({
                     (sum, item) => sum + item.parsed.y,
                     0
                   );
+
+                  if (percent) {
+                    // In percentage mode, show total as percentage without $ sign
+                    const totalValue = formatValue(total).replace("$", "");
+                    return [`Total: ${totalValue}%`];
+                  }
+
                   return [`Total: ${formatValue(total)}`];
                 },
               },
@@ -323,7 +382,7 @@ function LineChart({
       });
       hasRendered.current = true;
     } else {
-      chartRef.current.data = data;
+      chartRef.current.data = chartData;
       if (!hasRendered.current) {
         chartRef.current.update("none");
         hasRendered.current = true;
@@ -337,7 +396,9 @@ function LineChart({
       chartRef.current = null;
     };
   }, [
+    chartData,
     data,
+    percent,
     tooltipBodyColor,
     tooltipBgColor,
     tooltipBorderColor,

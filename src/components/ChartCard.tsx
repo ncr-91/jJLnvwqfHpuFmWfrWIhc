@@ -17,6 +17,9 @@ interface ChartCardProps {
 const ChartCard = ({ config }: ChartCardProps) => {
   const [view, setView] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [chartView, setChartView] = useState<"pie" | "bar">("pie");
+  const [lineChartView, setLineChartView] = useState<"volume" | "percentage">(
+    "volume"
+  );
 
   // Use dashboard01 config when in bar chart mode for dashboard05
   const effectiveConfig = useMemo(() => {
@@ -56,6 +59,8 @@ const ChartCard = ({ config }: ChartCardProps) => {
       setView={setView}
       chartView={chartView}
       setChartView={setChartView}
+      lineChartView={lineChartView}
+      setLineChartView={setLineChartView}
     />
   );
 };
@@ -69,6 +74,8 @@ interface SingleChartCardProps {
   setView: (v: "daily" | "weekly" | "monthly") => void;
   chartView: "pie" | "bar";
   setChartView: (v: "pie" | "bar") => void;
+  lineChartView: "volume" | "percentage";
+  setLineChartView: (v: "volume" | "percentage") => void;
 }
 
 const SingleChartCard = memo(
@@ -81,6 +88,8 @@ const SingleChartCard = memo(
     setView,
     chartView,
     setChartView,
+    lineChartView,
+    setLineChartView,
   }: SingleChartCardProps) => {
     const {
       chartType,
@@ -134,8 +143,25 @@ const SingleChartCard = memo(
                 }
                 loading={loading}
                 options={[
-                  { value: "pie", label: "Pie", icon: "pie_chart" },
-                  { value: "bar", label: "Bar", icon: "bar_chart" },
+                  { value: "pie", label: "Share", icon: "pie_chart" },
+                  { value: "bar", label: "Volume", icon: "bar_chart" },
+                ]}
+              />
+            </div>
+          )}
+          {id === "dashboard03" && (
+            <div className="absolute top-5 right-35">
+              <ChartTypeToggle
+                currentView={lineChartView}
+                onToggle={() =>
+                  setLineChartView(
+                    lineChartView === "volume" ? "percentage" : "volume"
+                  )
+                }
+                loading={loading}
+                options={[
+                  { value: "volume", label: "Volume", icon: "show_chart" },
+                  { value: "percentage", label: "Share", icon: "pie_chart" },
                 ]}
               />
             </div>
@@ -177,6 +203,8 @@ const SingleChartCard = memo(
             percent={
               config.id === "dashboard05" && chartView === "bar"
                 ? false
+                : config.id === "dashboard03"
+                ? lineChartView === "percentage"
                 : config.BarChartPercent
             }
             stacked={

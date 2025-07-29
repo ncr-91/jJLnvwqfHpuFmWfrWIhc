@@ -6,7 +6,11 @@ import App from "./App.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Router basename="/jJLnvwqfHpuFmWfrWIhc/">
+    <Router
+      basename={
+        process.env.NODE_ENV === "production" ? "/jJLnvwqfHpuFmWfrWIhc/" : "/"
+      }
+    >
       <App />
     </Router>
   </React.StrictMode>

@@ -118,6 +118,7 @@ const ChartContainer = memo(
             view={view}
             tooltipMode={tooltipMode}
             legendPosition={legendPosition}
+            percent={percent}
           />
         )}
       </div>

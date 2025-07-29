@@ -65,7 +65,7 @@ export const chartConfigs: CardConfig[] = [
     colors: colorPalette,
     showCardHeader: true,
     showCardHeaderBorder: true,
-    showCardActionButton: false,
+    showCardActionButton: true,
     showDropdownMenu: false,
     showTotal: false,
     showTrend: false,
