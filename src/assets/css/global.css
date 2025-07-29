@@ -1,0 +1,242 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=fallback");
+@import "tailwindcss";
+
+@theme {
+  --font-inter: "Inter", sans-serif;
+  --box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 6px;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5715;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5;
+  --text-base--letter-spacing: -0.01em;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.5;
+  --text-lg--letter-spacing: -0.01em;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.5;
+  --text-xl--letter-spacing: -0.01em;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 1.33;
+  --text-2xl--letter-spacing: -0.01em;
+  --text-3xl: 1.88rem;
+  --text-3xl--line-height: 1.33;
+  --text-3xl--letter-spacing: -0.01em;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 1.25;
+  --text-4xl--letter-spacing: -0.02em;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.25;
+  --text-5xl--letter-spacing: -0.02em;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1.2;
+  --text-6xl--letter-spacing: -0.02em;
+
+  /* ===== Color Variables ===== */
+
+  /* Oxford Blue */
+  --color-oxford-blue-50: #f7f7f8;
+  --color-oxford-blue-100: #f0eef0;
+  --color-oxford-blue-200: #dcd9de;
+  --color-oxford-blue-300: #beb7c2;
+  --color-oxford-blue-400: #9990a0;
+  --color-oxford-blue-500: #7d7285;
+  --color-oxford-blue-600: #665c6d;
+  --color-oxford-blue-700: #544b59;
+  --color-oxford-blue-800: #47414b;
+  --color-oxford-blue-900: #3b363e;
+  --color-oxford-blue-950: #29262b;
+
+  /* Teal */
+  --color-teal-50: #effefb;
+  --color-teal-100: #c7fff6;
+  --color-teal-200: #90ffec;
+  --color-teal-300: #51f7e2;
+  --color-teal-400: #1de4d1;
+  --color-teal-500: #04c8b8;
+  --color-teal-600: #00a89e; /* Hero colour */
+  --color-teal-700: #05807a;
+  --color-teal-800: #0a6562;
+  --color-teal-900: #0d5451;
+  --color-teal-950: #003333;
+
+  /* Frost Gray */
+  --color-frost-gray-50: #f6f7f8;
+  --color-frost-gray-100: #eaecef;
+  --color-frost-gray-200: #dadee3;
+  --color-frost-gray-300: #c0c8d0;
+  --color-frost-gray-400: #aab4bf;
+  --color-frost-gray-500: #8a96a7;
+  --color-frost-gray-600: #798397;
+  --color-frost-gray-700: #6c7589;
+  --color-frost-gray-800: #5c6271;
+  --color-frost-gray-900: #4c505c;
+  --color-frost-gray-950: #31333a;
+
+  /* Grape */
+  --color-grape-50: #f8f0fc;
+  --color-grape-100: #f3d9fa;
+  --color-grape-200: #eebefa;
+  --color-grape-300: #e599f7;
+  --color-grape-400: #da77f2;
+  --color-grape-500: #cc5de8;
+  --color-grape-600: #be4bdb;
+  --color-grape-700: #ae3ec9;
+  --color-grape-800: #9c36b5;
+  --color-grape-900: #862e9c;
+  --color-grape-950: #33113b;
+
+  /* Violet */
+  --color-violet-50: #f3f0ff;
+  --color-violet-100: #e5dbff;
+  --color-violet-200: #d0bfff;
+  --color-violet-300: #b197fc;
+  --color-violet-400: #9775fa;
+  --color-violet-500: #845ef7;
+  --color-violet-600: #7950f2;
+  --color-violet-700: #7048e8;
+  --color-violet-800: #6741d9;
+  --color-violet-900: #5f3dc4;
+  --color-violet-950: #2f1e62;
+
+  /* Bluebberry */
+  --color-blueberry-50: #e7f5ff;
+  --color-blueberry-100: #d0ebff;
+  --color-blueberry-200: #a5d8ff;
+  --color-blueberry-300: #74c0fc;
+  --color-blueberry-400: #4dabf7;
+  --color-blueberry-500: #339af0;
+  --color-blueberry-600: #228be6;
+  --color-blueberry-700: #1c7ed6;
+  --color-blueberry-800: #1971c2;
+  --color-blueberry-900: #1864ab;
+  --color-blueberry-950: #162456;
+
+  /* Pear */
+  --color-pear-50: #ebfbee;
+  --color-pear-100: #d3f9d8;
+  --color-pear-200: #b2f2bb;
+  --color-pear-300: #8ce99a;
+  --color-pear-400: #69db7c;
+  --color-pear-500: #51cf66;
+  --color-pear-600: #40c057;
+  --color-pear-700: #37b24d;
+  --color-pear-800: #2f9e44;
+  --color-pear-900: #2b8a3e;
+  --color-pear-950: #032e15;
+
+  /* Strawberry */
+  --color-strawberry-50: #fff5f5;
+  --color-strawberry-100: #ffe3e3;
+  --color-strawberry-200: #ffc9c9;
+  --color-strawberry-300: #ffa8a8;
+  --color-strawberry-400: #ff8787;
+  --color-strawberry-500: #ff6b6b;
+  --color-strawberry-600: #fa5252;
+  --color-strawberry-700: #f03e3e;
+  --color-strawberry-800: #e03131;
+  --color-strawberry-900: #c92a2a;
+  --color-strawberry-950: #460809;
+
+  /* Banana */
+  --color-banana-50: #fff9db;
+  --color-banana-100: #fff3bf;
+  --color-banana-200: #ffec99;
+  --color-banana-300: #ffe066;
+  --color-banana-400: #ffd43b;
+  --color-banana-500: #fcc419;
+  --color-banana-600: #fab005;
+  --color-banana-700: #f59f00;
+  --color-banana-800: #f08c00;
+  --color-banana-900: #e67700;
+  --color-banana-950: #432004;
+
+  /* Orange */
+  --color-orange-50: #fff4e6;
+  --color-orange-100: #ffe8cc;
+  --color-orange-200: #ffd8a8;
+  --color-orange-300: #ffc078;
+  --color-orange-400: #ffa94d;
+  --color-orange-500: #ff922b;
+  --color-orange-600: #fd7e14;
+  --color-orange-700: #f76707;
+  --color-orange-800: #e8590c;
+  --color-orange-900: #d9480f;
+  --color-orange-950: #441306;
+
+  /* Watermelon */
+  --color-watermelon-50: #fff0f6;
+  --color-watermelon-100: #ffdeeb;
+  --color-watermelon-200: #fcc2d7;
+  --color-watermelon-300: #faa2c1;
+  --color-watermelon-400: #f783ac;
+  --color-watermelon-500: #f06595;
+  --color-watermelon-600: #e64980;
+  --color-watermelon-700: #d6336c;
+  --color-watermelon-800: #c2255c;
+  --color-watermelon-900: #a61e4d;
+  --color-watermelon-950: #510424;
+}
+
+@layer components {
+  .dashboard {
+    @apply flex h-screen overflow-hidden;
+
+    .container {
+      @apply flex flex-col gap-5 mt-2.5;
+      h1 {
+        @apply text-xl font-semibold;
+      }
+    }
+  }
+}
+
+@layer utilities {
+  .wrapper {
+    @apply relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden;
+  }
+  .wrapper-md {
+    @apply w-full max-w-3xl px-4 lg:px-8 mx-auto;
+  }
+  .flex-center {
+    @apply flex justify-center items-center;
+  }
+  .flex-between {
+    @apply flex justify-between items-center;
+  }
+}
+
+/* ===== Global styles ===== 
+
+/* Theme Modes */
+/* Define light mode colors on :root */
+:root {
+  --color-bg: #f3f4f6;
+  --color-text: #1f2937;
+}
+
+/* Use the CSS variables */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  scroll-behavior: smooth;
+}
+
+/* Material Icons */
+.material-symbols-outlined {
+  font-size: 18px !important;
+  vertical-align: middle !important;
+}
+
+/* Chart.js x-axis label ellipsis */
+.chartjs-x-label {
+  display: inline-block;
+  max-width: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
