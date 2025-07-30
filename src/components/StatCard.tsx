@@ -1,4 +1,5 @@
 import { memo, useMemo, useState, useCallback } from "react";
+import LoadingBlock from "./CardElements/LoadingBlock";
 import { useOptimizedCardData } from "../hooks/useOptimizedCardData";
 import { calculateTrendPercentage } from "../utils/utils";
 import { formatCurrency } from "../utils/utils";
@@ -90,7 +91,7 @@ const SingleStatCard = memo(
                     className="flex items-center gap-2 w-full text-sm font-semibold text-left px-4 py-2 text-frost-gray-700 hover:bg-gray-100 transition duration-15"
                   >
                     <span className="material-symbols-outlined">
-                      {viewMode === "chart" ? "data_table" : "bar_chart"}
+                      {viewMode === "chart" ? "data_table" : "show_chart"}
                     </span>
                     <span>{viewMode === "chart" ? "Table" : "Chart"}</span>
                   </button>
@@ -100,7 +101,7 @@ const SingleStatCard = memo(
           </div>
         )}
         {(showTotal || showTrend) && (
-          <div className="flex items-start px-7">
+          <div className="flex items-center px-7">
             {showTotal && (
               <TotalValue
                 loading={loading}
@@ -108,12 +109,14 @@ const SingleStatCard = memo(
               />
             )}
             {showTrend && (
-              <TrendPill
-                loading={loading}
-                isDecrement={loading ? false : isDecrement}
-                percentage={loading ? 0 : percentage}
-                showYoY={true}
-              />
+              <div className={`flex items-center ${loading ? "-mt-2" : ""}`}>
+                <TrendPill
+                  loading={loading}
+                  isDecrement={loading ? false : isDecrement}
+                  percentage={loading ? 0 : percentage}
+                  showYoY={true}
+                />
+              </div>
             )}
           </div>
         )}
@@ -166,13 +169,13 @@ const SingleStatCard = memo(
                           {[...Array(3)].map((_, i) => (
                             <tr key={i}>
                               <td className="px-2 py-1 border-b border-gray-100">
-                                <span className="inline-block h-5 w-16 bg-frost-gray-200 rounded animate-pulse" />
+                                <LoadingBlock size="sm" width="w-16" />
                               </td>
                               <td className="px-2 py-1 border-b border-gray-100">
-                                <span className="inline-block h-5 w-12 bg-frost-gray-200 rounded animate-pulse" />
+                                <LoadingBlock size="sm" width="w-12" />
                               </td>
                               <td className="px-2 py-1 border-b border-gray-100">
-                                <span className="inline-block h-5 w-12 bg-frost-gray-200 rounded animate-pulse" />
+                                <LoadingBlock size="sm" width="w-12" />
                               </td>
                             </tr>
                           ))}

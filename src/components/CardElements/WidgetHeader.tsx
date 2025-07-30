@@ -1,4 +1,5 @@
 import React from "react";
+import LoadingBlock from "./LoadingBlock";
 
 interface WidgetHeaderProps {
   loading: boolean;
@@ -15,20 +16,18 @@ const WidgetHeader: React.FC<WidgetHeaderProps> = ({
 }) => (
   <>
     <div className="px-5 pt-4">
-      <div className="flex items-center mb-1 min-h-[2.5rem]">
+      <div className="flex items-start mb-1">
         {loading ? (
-          <span className="inline-block h-8 w-32 bg-frost-gray-200 rounded animate-pulse" />
+          <LoadingBlock size="custom" height="h-8" width="w-32" />
         ) : (
           <div className="flex items-center gap-2">
             <div>
               <h2 className="text-md font-semibold text-oxford-blue-600 leading-tight">
                 {title}
               </h2>
-              {subtitle && !loading && (
-                <div className="text-xs text-frost-gray-500 font-medium mt-0.5">
-                  {subtitle}
-                </div>
-              )}
+              <div className="text-xs text-frost-gray-500 font-medium mt-0.5 h-3">
+                {subtitle && !loading ? subtitle : "\u00A0"}
+              </div>
             </div>
           </div>
         )}

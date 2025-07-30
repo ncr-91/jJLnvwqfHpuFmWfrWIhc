@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import LoadingBlock from "./CardElements/LoadingBlock";
 import AustraliaMap from "react-australia-map";
 import CardHeader from "./CardElements/CardHeader";
 import type { CardConfig } from "../config/cardConfigs";
@@ -110,7 +111,7 @@ const MapCard: React.FC<MapCardProps> = ({ config }) => {
       )}
       <div className="flex-1 min-h-0 flex flex-col overflow-x-auto px-5 pt-5 pb-5">
         {loading ? (
-          <div className="w-full h-full bg-frost-gray-200 rounded animate-pulse" />
+          <LoadingBlock size="custom" height="h-full" width="w-full" />
         ) : (
           <>
             <div

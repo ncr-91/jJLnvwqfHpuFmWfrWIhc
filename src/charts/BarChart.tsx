@@ -2,27 +2,12 @@ import { useRef, useEffect, useState, useMemo } from "react";
 import { chartColors } from "../utils/ChartjsConfig";
 import {
   Chart,
-  BarController,
-  BarElement,
-  LinearScale,
-  CategoryScale,
-  Tooltip,
-  Legend,
   type ChartData,
   type ChartOptions,
   type Plugin,
   type TooltipItem,
 } from "chart.js";
 import { formatValue } from "../utils/utils";
-
-Chart.register(
-  BarController,
-  BarElement,
-  LinearScale,
-  CategoryScale,
-  Tooltip,
-  Legend
-);
 
 interface BarChartStackedProps {
   id?: string;
@@ -55,9 +40,14 @@ function BarChart({
   showChartGridlineX = false,
   showChartGridlineY = true,
 }: BarChartStackedProps) {
-  const [, setChart] = useState<Chart<"bar"> | null>(null);
+  // ===== 1. Chart Instance Management =====
+  const [chart, setChart] = useState<Chart<"bar"> | null>(null);
+  const [isInitialRender, setIsInitialRender] = useState(true);
+
+  // ===== 10. Proper Chart Cleanup with useRef =====
   const canvas = useRef<HTMLCanvasElement>(null);
   const legend = useRef<HTMLUListElement>(null);
+
   const { tooltipBodyColor, tooltipBgColor, tooltipBorderColor } = chartColors;
 
   // Normalize data for horizontal stacked charts to show percentages (like pie chart)
@@ -115,6 +105,7 @@ function BarChart({
     chartInstance.update("none");
   };
 
+  // ===== 2. Empty Dependency Array in Initial useEffect =====
   useEffect(() => {
     const ctx = canvas.current;
     if (!ctx) return;
@@ -364,7 +355,7 @@ function BarChart({
       resizeDelay: 200,
       elements: {
         bar: {
-          borderRadius: 4,
+          // Border radius is set per dataset after chart creation
         },
       },
       interaction: isHorizontal
@@ -437,9 +428,89 @@ function BarChart({
       },
     };
 
+    // Apply border radius to the data before creating the chart
+    const dataWithBorderRadius = {
+      ...normalizedData,
+      datasets: normalizedData.datasets.map((dataset, index) => {
+        const isLastDataset = index === normalizedData.datasets.length - 1;
+
+        if (isStacked) {
+          // For stacked charts, only round the appropriate corners of the topmost dataset
+          if (isLastDataset) {
+            if (isHorizontal) {
+              // For horizontal stacked charts, round the right corners
+              return {
+                ...dataset,
+                borderRadius: {
+                  topLeft: 0,
+                  topRight: 4,
+                  bottomLeft: 0,
+                  bottomRight: 4,
+                },
+                borderSkipped: false,
+              };
+            } else {
+              // For vertical stacked charts, round the top corners
+              return {
+                ...dataset,
+                borderRadius: {
+                  topLeft: 4,
+                  topRight: 4,
+                  bottomLeft: 0,
+                  bottomRight: 0,
+                },
+                borderSkipped: false,
+              };
+            }
+          } else {
+            return {
+              ...dataset,
+              borderRadius: 0,
+              borderSkipped: false,
+            };
+          }
+        } else {
+          // For non-stacked charts, always round the last dataset
+          if (isLastDataset) {
+            if (isHorizontal) {
+              // For horizontal charts, round the right corners
+              return {
+                ...dataset,
+                borderRadius: {
+                  topLeft: 0,
+                  topRight: 4,
+                  bottomLeft: 0,
+                  bottomRight: 4,
+                },
+                borderSkipped: false,
+              };
+            } else {
+              // For vertical charts, round the top corners
+              return {
+                ...dataset,
+                borderRadius: {
+                  topLeft: 4,
+                  topRight: 4,
+                  bottomLeft: 0,
+                  bottomRight: 0,
+                },
+                borderSkipped: false,
+              };
+            }
+          } else {
+            return {
+              ...dataset,
+              borderRadius: 0,
+              borderSkipped: false,
+            };
+          }
+        }
+      }),
+    };
+
     chartInstance = new Chart<"bar">(ctx, {
       type: "bar",
-      data: normalizedData,
+      data: dataWithBorderRadius,
       options: chartOptions,
       plugins: [htmlLegendPlugin],
     });
@@ -447,9 +518,11 @@ function BarChart({
     // Apply border radius to all bars after chart creation
     if (chartInstance.data.datasets) {
       chartInstance.data.datasets.forEach((dataset, index) => {
+        const isLastDataset = index === chartInstance.data.datasets.length - 1;
+
         if (isStacked) {
           // For stacked charts, only round the appropriate corners of the topmost dataset
-          if (index === chartInstance.data.datasets.length - 1) {
+          if (isLastDataset) {
             if (isHorizontal) {
               // For horizontal stacked charts, round the right corners
               dataset.borderRadius = {
@@ -471,42 +544,76 @@ function BarChart({
             dataset.borderRadius = 0; // No rounding for middle/bottom segments
           }
         } else {
-          // For non-stacked charts, round the appropriate corners based on direction
-          if (isHorizontal) {
-            // For horizontal charts, round the right corners
-            dataset.borderRadius = {
-              topLeft: 0,
-              topRight: 4,
-              bottomLeft: 0,
-              bottomRight: 4,
-            };
+          // For non-stacked charts, always round the last dataset
+          if (isLastDataset) {
+            if (isHorizontal) {
+              // For horizontal charts, round the right corners
+              dataset.borderRadius = {
+                topLeft: 0,
+                topRight: 4,
+                bottomLeft: 0,
+                bottomRight: 4,
+              };
+            } else {
+              // For vertical charts, round the top corners
+              dataset.borderRadius = {
+                topLeft: 4,
+                topRight: 4,
+                bottomLeft: 0,
+                bottomRight: 0,
+              };
+            }
           } else {
-            // For vertical charts, round the top corners
-            dataset.borderRadius = 4;
+            dataset.borderRadius = 0; // No rounding for other datasets
           }
         }
         dataset.borderSkipped = false; // This ensures border radius is applied
       });
-      chartInstance.update("none"); // Update without animation
+
+      // Force a redraw to ensure border radius is applied
+      chartInstance.update("none");
     }
 
     setChart(chartInstance);
+    // ===== 10. Proper Chart Cleanup =====
     return () => {
       if (chartInstance) {
         chartInstance.destroy();
       }
     };
-  }, [
-    normalizedData,
-    direction,
-    percent,
-    stacked,
-    showChartLegend,
-    showChartLabelsX,
-    showChartLabelsY,
-    showChartGridlineX,
-    showChartGridlineY,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ===== 3. chart.update() for Data Changes =====
+  useEffect(() => {
+    if (!chart) return;
+
+    chart.data = normalizedData;
+
+    if (isInitialRender) {
+      // Use animation only for initial render
+      chart.update();
+      setIsInitialRender(false);
+    } else {
+      // Use no animation for subsequent updates to prevent jittering
+      chart.update("none");
+    }
+  }, [chart, normalizedData, isInitialRender]);
+
+  // ===== 3. chart.update('none') for Theme Changes =====
+  useEffect(() => {
+    if (!chart) return;
+
+    if (chart.options.plugins?.tooltip) {
+      chart.options.plugins.tooltip.bodyColor =
+        tooltipBodyColor?.light || "#000";
+      chart.options.plugins.tooltip.backgroundColor =
+        tooltipBgColor?.light || "#fff";
+      chart.options.plugins.tooltip.borderColor =
+        tooltipBorderColor?.light || "#ccc";
+    }
+    chart.update("none"); // No animation to prevent jittering
+  }, [chart, tooltipBodyColor, tooltipBgColor, tooltipBorderColor]);
 
   return (
     <div

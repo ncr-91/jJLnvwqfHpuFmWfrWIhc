@@ -231,6 +231,11 @@ body {
   vertical-align: middle !important;
 }
 
+.msolarge {
+  font-size: 22px !important;
+  vertical-align: middle !important;
+}
+
 /* Chart.js x-axis label ellipsis */
 .chartjs-x-label {
   display: inline-block;

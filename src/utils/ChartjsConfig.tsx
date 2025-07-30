@@ -1,27 +1,54 @@
-import { Chart, Tooltip } from "chart.js";
+import {
+  Chart,
+  Tooltip,
+  LineController,
+  LineElement,
+  Filler,
+  PointElement,
+  LinearScale,
+  TimeScale,
+  CategoryScale,
+  BarController,
+  BarElement,
+  PieController,
+  ArcElement,
+  Legend,
+} from "chart.js";
 import type { ChartArea } from "chart.js";
 import { getCssVar, hexToRgba } from "./cssColorHelper";
 
-// Register Tooltip plugin
-Chart.register(Tooltip);
+// Register all plugins globally to prevent conflicts
+Chart.register(
+  Tooltip,
+  LineController,
+  LineElement,
+  Filler,
+  PointElement,
+  LinearScale,
+  TimeScale,
+  CategoryScale,
+  BarController,
+  BarElement,
+  PieController,
+  ArcElement,
+  Legend
+);
 
-// Chart.js default styles
+// Global Chart.js defaults to prevent jittering
 Chart.defaults.font.family = '"Inter", sans-serif';
 Chart.defaults.font.weight = 500;
 Chart.defaults.font.size = 12;
-Chart.defaults.color = getCssVar("--color-gray-500");
 
-Object.assign(Chart.defaults.plugins.tooltip, {
-  borderWidth: 1,
-  displayColors: false,
-  mode: "nearest",
-  intersect: false,
-  position: "nearest",
-  caretSize: 0,
-  caretPadding: 20,
-  cornerRadius: 8,
-  padding: 8,
-});
+// Tooltip defaults for stable interactions
+Chart.defaults.plugins.tooltip.borderWidth = 1;
+Chart.defaults.plugins.tooltip.displayColors = false;
+Chart.defaults.plugins.tooltip.mode = "nearest";
+Chart.defaults.plugins.tooltip.intersect = false;
+Chart.defaults.plugins.tooltip.position = "nearest";
+Chart.defaults.plugins.tooltip.caretSize = 0;
+Chart.defaults.plugins.tooltip.caretPadding = 20;
+Chart.defaults.plugins.tooltip.cornerRadius = 8;
+Chart.defaults.plugins.tooltip.padding = 8;
 
 /**
  * Generate a linear vertical gradient from bottom to top of a chart area

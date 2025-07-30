@@ -78,9 +78,63 @@ export const useFormattedChartData = (
               const topDatasetIndex =
                 visibleDatasetIndexes[visibleDatasetIndexes.length - 1];
 
-              return datasetIndex === topDatasetIndex
-                ? { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 }
-                : { topLeft: 0, topRight: 0, bottomLeft: 0, bottomRight: 0 };
+              // Check if this is a horizontal chart
+              const isHorizontal = chart.options.indexAxis === "y";
+
+              // Check if this is a stacked chart
+              const isStacked =
+                chart.options.scales?.x?.stacked ||
+                chart.options.scales?.y?.stacked;
+
+              if (isStacked) {
+                // For stacked charts, only round the top dataset
+                if (datasetIndex === topDatasetIndex) {
+                  if (isHorizontal) {
+                    // For horizontal stacked charts, round the right corners
+                    return {
+                      topLeft: 0,
+                      topRight: 4,
+                      bottomLeft: 0,
+                      bottomRight: 4,
+                    };
+                  } else {
+                    // For vertical stacked charts, round the top corners
+                    return {
+                      topLeft: 4,
+                      topRight: 4,
+                      bottomLeft: 0,
+                      bottomRight: 0,
+                    };
+                  }
+                } else {
+                  // No rounding for other segments in stacked charts
+                  return {
+                    topLeft: 0,
+                    topRight: 0,
+                    bottomLeft: 0,
+                    bottomRight: 0,
+                  };
+                }
+              } else {
+                // For non-stacked charts, round all bars
+                if (isHorizontal) {
+                  // For horizontal non-stacked charts, round the right corners
+                  return {
+                    topLeft: 0,
+                    topRight: 4,
+                    bottomLeft: 0,
+                    bottomRight: 4,
+                  };
+                } else {
+                  // For vertical non-stacked charts, round the top corners
+                  return {
+                    topLeft: 4,
+                    topRight: 4,
+                    bottomLeft: 0,
+                    bottomRight: 0,
+                  };
+                }
+              }
             },
           };
         }

@@ -19,7 +19,8 @@ export type ParserType =
   | "barChart"
   | "shareChartExtended"
   | "pieChart"
-  | "widgetMap";
+  | "widgetMap"
+  | "heatmap";
 
 export interface ChartData {
   labels: string[];
@@ -39,6 +40,7 @@ export type ParsedSheetData = {
   currentMonthCount?: number | null;
   lastMonthCount?: number | null;
   total?: number | null;
+  heatmapData?: Array<{ date: string; count: number }>;
 };
 
 export interface ParsedTableData {

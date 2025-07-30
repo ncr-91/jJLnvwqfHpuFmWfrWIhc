@@ -2,18 +2,12 @@ import { useRef, useEffect, useState } from "react";
 import { chartColors } from "../utils/ChartjsConfig";
 import {
   Chart,
-  PieController,
-  ArcElement,
-  Tooltip,
-  Legend,
   type ChartData,
   type ChartOptions,
   type Plugin,
   type TooltipItem,
 } from "chart.js";
 import { formatValue } from "../utils/utils";
-
-Chart.register(PieController, ArcElement, Tooltip, Legend);
 
 interface PieChartProps {
   id?: string;
@@ -41,6 +35,7 @@ function PieChart({
   cutout = 0,
 }: PieChartProps) {
   const [chart, setChart] = useState<Chart<"pie"> | null>(null);
+  const [isInitialRender, setIsInitialRender] = useState(true);
   const canvas = useRef<HTMLCanvasElement>(null);
   const legend = useRef<HTMLUListElement>(null);
   const isMounted = useRef(true);
@@ -231,16 +226,38 @@ function PieChart({
         }
       }
     };
-  }, [
-    data,
-    percent,
-    showChartLegend,
-    showChartLabelsX,
-    showChartLabelsY,
-    showChartGridlineX,
-    showChartGridlineY,
-    cutout,
-  ]);
+  }, []);
+
+  // ===== 3. chart.update() for Data Changes =====
+  useEffect(() => {
+    if (!chart) return;
+
+    chart.data = data;
+
+    if (isInitialRender) {
+      // Use animation only for initial render
+      chart.update();
+      setIsInitialRender(false);
+    } else {
+      // Use no animation for subsequent updates to prevent jittering
+      chart.update("none");
+    }
+  }, [chart, data, isInitialRender]);
+
+  // ===== 3. chart.update('none') for Theme Changes =====
+  useEffect(() => {
+    if (!chart) return;
+
+    if (chart.options.plugins?.tooltip) {
+      chart.options.plugins.tooltip.bodyColor =
+        tooltipBodyColor?.light || "#000";
+      chart.options.plugins.tooltip.backgroundColor =
+        tooltipBgColor?.light || "#fff";
+      chart.options.plugins.tooltip.borderColor =
+        tooltipBorderColor?.light || "#ccc";
+    }
+    chart.update("none"); // No animation to prevent jittering
+  }, [chart, tooltipBodyColor, tooltipBgColor, tooltipBorderColor]);
 
   // Force chart resize when container size changes
   useEffect(() => {

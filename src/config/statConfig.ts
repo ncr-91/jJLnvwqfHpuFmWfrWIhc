@@ -6,7 +6,7 @@ export const statConfigs: CardConfig[] = [
     id: "stat01",
     type: "stat",
     size: "sm",
-    rowSpan: 1,
+    rowSpan: 2,
     csvUrl:
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLjue9MJvewUb1ZK7TZ4XgVjM0vRsfb07tPzDTbkGWNzfWAtLfY-NsRHZv5W-HM9W87vorat1fGnz8/pub?gid=854073483&single=true&output=csv",
     chartType: "line",
@@ -38,7 +38,7 @@ export const statConfigs: CardConfig[] = [
     id: "stat02",
     type: "stat",
     size: "sm",
-    rowSpan: 1,
+    rowSpan: 2,
     csvUrl:
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLjue9MJvewUb1ZK7TZ4XgVjM0vRsfb07tPzDTbkGWNzfWAtLfY-NsRHZv5W-HM9W87vorat1fGnz8/pub?gid=139764031&single=true&output=csv",
     chartType: "line",
@@ -70,7 +70,7 @@ export const statConfigs: CardConfig[] = [
     id: "stat03",
     type: "stat",
     size: "sm",
-    rowSpan: 1,
+    rowSpan: 2,
     csvUrl:
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLjue9MJvewUb1ZK7TZ4XgVjM0vRsfb07tPzDTbkGWNzfWAtLfY-NsRHZv5W-HM9W87vorat1fGnz8/pub?gid=470486338&single=true&output=csv",
     chartType: "line",

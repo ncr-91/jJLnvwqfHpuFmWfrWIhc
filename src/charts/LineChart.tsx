@@ -2,14 +2,6 @@ import { useRef, useEffect, useMemo } from "react";
 import { chartColors } from "../utils/ChartjsConfig.tsx";
 import {
   Chart,
-  LineController,
-  LineElement,
-  Filler,
-  PointElement,
-  LinearScale,
-  TimeScale,
-  Tooltip,
-  CategoryScale,
   type ChartData,
   type ChartOptions,
   type Plugin,
@@ -17,17 +9,6 @@ import {
 import "chartjs-adapter-moment";
 import { formatValue } from "../utils/utils";
 import { parseISO, format, getISOWeek } from "date-fns";
-
-Chart.register(
-  LineController,
-  LineElement,
-  Filler,
-  PointElement,
-  LinearScale,
-  TimeScale,
-  Tooltip,
-  CategoryScale
-);
 
 interface LineChartProps {
   data: ChartData<"line">;
@@ -78,7 +59,16 @@ function LineChart({
     const totals = labels.map((_, index) => {
       return datasets.reduce((sum, dataset) => {
         const value = dataset.data[index];
-        return sum + (typeof value === "number" ? value : 0);
+        // Handle both number and {x, y} object formats (same logic as useOptimizedCardData)
+        let numericValue;
+        if (value && typeof value === "object" && "y" in value) {
+          numericValue = value.y;
+        } else if (typeof value === "number") {
+          numericValue = value;
+        } else {
+          numericValue = 0;
+        }
+        return sum + numericValue;
       }, 0);
     });
 
@@ -87,7 +77,16 @@ function LineChart({
       ...dataset,
       data: dataset.data.map((value, index) => {
         const total = totals[index];
-        return total > 0 ? ((value as number) / total) * 100 : 0;
+        // Handle both number and {x, y} object formats
+        let numericValue;
+        if (value && typeof value === "object" && "y" in value) {
+          numericValue = value.y;
+        } else if (typeof value === "number") {
+          numericValue = value;
+        } else {
+          numericValue = 0;
+        }
+        return total > 0 ? (numericValue / total) * 100 : 0;
       }),
     }));
 
@@ -96,6 +95,22 @@ function LineChart({
       datasets: percentageDatasets,
     };
   }, [data, percent]);
+
+  // Create a stable data hash to prevent unnecessary re-renders
+  const dataHash = useMemo(() => {
+    return JSON.stringify({
+      labels: chartData.labels,
+      datasets: chartData.datasets.map((dataset) => ({
+        label: dataset.label,
+        data: dataset.data,
+        borderColor: dataset.borderColor,
+        backgroundColor: dataset.backgroundColor,
+      })),
+      percent,
+      view,
+      xAxisType,
+    });
+  }, [chartData, percent, view, xAxisType]);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -336,14 +351,29 @@ function LineChart({
 
                   if (percent) {
                     // In percentage mode, show both percentage and original value
-                    const originalValue =
+                    const originalDataPoint =
                       data.datasets[context.datasetIndex!].data[
                         context.dataIndex!
                       ];
+                    let originalValue;
+
+                    // Handle both number and {x, y} object formats (same logic as useOptimizedCardData)
+                    if (
+                      originalDataPoint &&
+                      typeof originalDataPoint === "object" &&
+                      "y" in originalDataPoint
+                    ) {
+                      originalValue = originalDataPoint.y;
+                    } else if (typeof originalDataPoint === "number") {
+                      originalValue = originalDataPoint;
+                    } else {
+                      originalValue = 0;
+                    }
+
                     // Remove $ sign from percentage value
                     const percentageValue = value.replace("$", "");
                     return `${datasetLabel}: ${percentageValue}% (${formatValue(
-                      originalValue as number
+                      originalValue
                     )})`;
                   }
 
@@ -382,12 +412,18 @@ function LineChart({
       });
       hasRendered.current = true;
     } else {
-      chartRef.current.data = chartData;
-      if (!hasRendered.current) {
-        chartRef.current.update("none");
-        hasRendered.current = true;
-      } else {
-        chartRef.current.update();
+      // Only update if data has actually changed
+      const currentDataHash = JSON.stringify(chartRef.current.data);
+      const newDataHash = JSON.stringify(chartData);
+
+      if (currentDataHash !== newDataHash) {
+        chartRef.current.data = chartData;
+        if (!hasRendered.current) {
+          chartRef.current.update("none");
+          hasRendered.current = true;
+        } else {
+          chartRef.current.update("none"); // Use no animation to prevent jittering
+        }
       }
     }
 
@@ -396,17 +432,13 @@ function LineChart({
       chartRef.current = null;
     };
   }, [
-    chartData,
-    data,
-    percent,
+    dataHash,
     tooltipBodyColor,
     tooltipBgColor,
     tooltipBorderColor,
     showChartLegend,
     showChartGridlineX,
     showChartGridlineY,
-    xAxisType,
-    view,
     tooltipMode,
   ]);
 

@@ -1,4 +1,5 @@
 import { cn } from "../../utils/utils";
+import LoadingBlock from "./LoadingBlock";
 
 interface TrendPillProps {
   loading: boolean;
@@ -25,13 +26,18 @@ const TrendPill = ({
     <div className="flex items-center gap-1 self-center min-h-[1.5rem]">
       <figure
         className={cn(
-          "flex items-center gap-0.5 px-2 py-0.5 rounded-full min-h-[1.5rem]",
+          "flex items-center justify-center gap-0.5 px-2 py-0.5 rounded-full min-h-[1.5rem]",
           pillBg
         )}
         style={{ minHeight: "1.5rem" }}
       >
         {loading ? (
-          <span className="inline-block h-5 w-20 rounded-full bg-frost-gray-200 animate-pulse" />
+          <LoadingBlock
+            size="custom"
+            height="h-7"
+            width="w-14"
+            className="rounded-full"
+          />
         ) : (
           <>
             <span

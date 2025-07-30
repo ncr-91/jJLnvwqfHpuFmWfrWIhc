@@ -5,7 +5,8 @@ export type CardType =
   | "creative"
   | "widget"
   | "widgetMap"
-  | "map";
+  | "map"
+  | "heatmap";
 
 export interface CardConfig {
   id: string;
@@ -31,9 +32,9 @@ export interface CardConfig {
   showLineChartGradient?: boolean;
   showChartLabelsX?: boolean;
   showChartLabelsY?: boolean;
-  pieChartCutout?: number; // For pie chart donut effect (0-100)
-  pieChartType?: "pie" | "donut"; // Toggle between pie and donut chart
-  showWidgetSubtitle?: boolean; // default false
+  pieChartCutout?: number;
+  pieChartType?: "pie" | "donut";
+  showWidgetSubtitle?: boolean;
   parserType?:
     | "shareChart"
     | "shareChartExtended"
@@ -45,16 +46,22 @@ export interface CardConfig {
     | "barChart"
     | "widgetMap"
     | "map"
-    | "pieChart";
+    | "pieChart"
+    | "heatmap";
 
   xAxisType?: "category" | "time";
   view?: "daily" | "weekly" | "monthly";
+  thumbnailUrls?: string[];
+  mediaUrls?: string[];
 }
 
 export const cardSizeClasses = {
+  xxs: "col-span-full sm:col-span-4 md:col-span-4 xl:col-span-1",
   xs: "col-span-full sm:col-span-12 md:col-span-6 xl:col-span-2",
+  ssm: "col-span-full sm:col-span-12 md:col-span-6 xl:col-span-3",
   sm: "col-span-full sm:col-span-12 md:col-span-6 xl:col-span-4",
   md: "col-span-full sm:col-span-12 md:col-span-6 xl:col-span-6",
   lg: "col-span-full sm:col-span-12 md:col-span-12 xl:col-span-8",
-  xl: "col-span-full sm:col-span-12 md:col-span-12 xl:col-span-12",
+  xl: "col-span-full sm:col-span-12 md:col-span-12 xl:col-span-9",
+  xxl: "col-span-full sm:col-span-12 md:col-span-12 xl:col-span-12",
 } as const;

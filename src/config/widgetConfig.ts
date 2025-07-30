@@ -7,7 +7,7 @@ export const widgetConfigs: CardConfig[] = [
     id: "widget01",
     type: "widget",
     size: "xs",
-    rowSpan: 1,
+    rowSpan: 2,
     csvUrl:
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLjue9MJvewUb1ZK7TZ4XgVjM0vRsfb07tPzDTbkGWNzfWAtLfY-NsRHZv5W-HM9W87vorat1fGnz8/pub?gid=1403129334&single=true&output=csv",
     chartType: "bar",
@@ -38,7 +38,7 @@ export const widgetConfigs: CardConfig[] = [
     id: "widget02",
     type: "widget",
     size: "xs",
-    rowSpan: 1,
+    rowSpan: 2,
     csvUrl:
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLjue9MJvewUb1ZK7TZ4XgVjM0vRsfb07tPzDTbkGWNzfWAtLfY-NsRHZv5W-HM9W87vorat1fGnz8/pub?gid=1129371862&single=true&output=csv",
     chartType: "pie",
@@ -65,7 +65,7 @@ export const widgetConfigs: CardConfig[] = [
     id: "widget03",
     type: "widget",
     size: "xs",
-    rowSpan: 1,
+    rowSpan: 2,
     csvUrl:
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLjue9MJvewUb1ZK7TZ4XgVjM0vRsfb07tPzDTbkGWNzfWAtLfY-NsRHZv5W-HM9W87vorat1fGnz8/pub?gid=263914883&single=true&output=csv",
     chartType: "bar",
@@ -96,7 +96,7 @@ export const widgetConfigs: CardConfig[] = [
     id: "widget04",
     type: "widgetMap",
     size: "xs",
-    rowSpan: 1,
+    rowSpan: 2,
     csvUrl:
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLjue9MJvewUb1ZK7TZ4XgVjM0vRsfb07tPzDTbkGWNzfWAtLfY-NsRHZv5W-HM9W87vorat1fGnz8/pub?gid=796109113&single=true&output=csv",
     showCardHeader: true,

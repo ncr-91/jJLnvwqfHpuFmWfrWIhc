@@ -8,14 +8,14 @@ import ChartContainer from "../charts/ChartContainer";
 import ChartTimeSeriesMenu from "./CardElements/ChartTimeSeriesMenu";
 import ChartTypeToggle from "./CardElements/ChartTypeToggle";
 import type { CardConfig } from "../config/cardConfigs";
-import { cardSizeClasses } from "../config/cardConfigs";
+import { cardSizeClasses, chartConfigs } from "../config/cardConfigs";
 
 interface ChartCardProps {
   config: CardConfig;
 }
 
 const ChartCard = ({ config }: ChartCardProps) => {
-  const [view, setView] = useState<"daily" | "weekly" | "monthly">("monthly");
+  const [view, setView] = useState<"daily" | "weekly" | "monthly">("weekly");
   const [chartView, setChartView] = useState<"pie" | "bar">("pie");
   const [lineChartView, setLineChartView] = useState<"volume" | "percentage">(
     "volume"
@@ -24,18 +24,21 @@ const ChartCard = ({ config }: ChartCardProps) => {
   // Use dashboard01 config when in bar chart mode for dashboard05
   const effectiveConfig = useMemo(() => {
     if (config.id === "dashboard05" && chartView === "bar") {
-      // Find dashboard01 config
-      const dashboard01Config: CardConfig = {
-        ...config,
-        csvUrl:
-          "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLjue9MJvewUb1ZK7TZ4XgVjM0vRsfb07tPzDTbkGWNzfWAtLfY-NsRHZv5W-HM9W87vorat1fGnz8/pub?gid=1166537229&single=true&output=csv",
-        chartType: "bar",
-        BarChartStacked: true,
-        BarChartDirection: "vertical",
-        BarChartPercent: false,
-        parserType: "barChart",
-      };
-      return dashboard01Config;
+      const dashboard01Config = chartConfigs.find(
+        (c) => c.id === "dashboard01"
+      );
+      if (dashboard01Config) {
+        return {
+          ...dashboard01Config,
+          id: config.id,
+          showCardActionButton: config.showCardActionButton,
+          showCardHeader: config.showCardHeader,
+          showCardHeaderBorder: config.showCardHeaderBorder,
+          showDropdownMenu: config.showDropdownMenu,
+          showTotal: config.showTotal,
+          showTrend: config.showTrend,
+        };
+      }
     }
     return config;
   }, [config, chartView]);
@@ -126,7 +129,36 @@ const SingleChartCard = memo(
             title={loading ? undefined : data?.headerTitle}
           />
           {id === "dashboard03" && (
-            <div className="absolute top-5 right-5">
+            <div className="absolute top-5 right-5 flex flex-row items-center gap-3">
+              {/* Only show ChartTypeToggle if there are multiple datasets with data */}
+              {data?.chartData?.datasets &&
+                data.chartData.datasets.length > 1 &&
+                data.chartData.datasets.some(
+                  (dataset: any) =>
+                    dataset.data &&
+                    Array.isArray(dataset.data) &&
+                    dataset.data.some(
+                      (value: any) => typeof value === "number" && value > 0
+                    )
+                ) && (
+                  <ChartTypeToggle
+                    currentView={lineChartView}
+                    onToggle={() =>
+                      setLineChartView(
+                        lineChartView === "volume" ? "percentage" : "volume"
+                      )
+                    }
+                    loading={loading}
+                    options={[
+                      { value: "volume", label: "Volume", icon: "show_chart" },
+                      {
+                        value: "percentage",
+                        label: "Share",
+                        icon: "pie_chart",
+                      },
+                    ]}
+                  />
+                )}
               <ChartTimeSeriesMenu
                 loading={loading}
                 value={view}
@@ -145,23 +177,6 @@ const SingleChartCard = memo(
                 options={[
                   { value: "pie", label: "Share", icon: "pie_chart" },
                   { value: "bar", label: "Volume", icon: "bar_chart" },
-                ]}
-              />
-            </div>
-          )}
-          {id === "dashboard03" && (
-            <div className="absolute top-5 right-35">
-              <ChartTypeToggle
-                currentView={lineChartView}
-                onToggle={() =>
-                  setLineChartView(
-                    lineChartView === "volume" ? "percentage" : "volume"
-                  )
-                }
-                loading={loading}
-                options={[
-                  { value: "volume", label: "Volume", icon: "show_chart" },
-                  { value: "percentage", label: "Share", icon: "pie_chart" },
                 ]}
               />
             </div>
@@ -193,7 +208,9 @@ const SingleChartCard = memo(
             loading={loading}
             chartData={loading ? undefined : data?.chartData}
             type={
-              config.id === "dashboard05" ? chartView : (chartType as string)
+              config.id === "dashboard05"
+                ? chartView
+                : (chartType as "pie" | "bar" | "line")
             }
             direction={
               config.id === "dashboard05" && chartView === "bar"

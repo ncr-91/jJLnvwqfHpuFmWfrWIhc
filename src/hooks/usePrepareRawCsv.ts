@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Papa from "papaparse";
 import type {
   ParsedSheetData,
@@ -7,11 +7,14 @@ import type {
   ChartData,
 } from "./types";
 
-// Cache for CSV requests to prevent duplicate fetches
-const csvCache = new Map<
-  string,
-  Promise<ParsedSheetData | ParsedTableData | ParsedMapData>
->();
+// Enhanced cache with TTL (Time To Live) to prevent memory leaks
+interface CacheEntry {
+  data: ParsedSheetData | ParsedTableData | ParsedMapData;
+  timestamp: number;
+}
+
+const csvCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 // Map data type for MapCard
 export type MapDataRow = { state: string; value: string };
@@ -23,6 +26,7 @@ export function useCsvData(csvUrl: string, parserType: ParserType) {
   >(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!csvUrl) {
@@ -32,29 +36,37 @@ export function useCsvData(csvUrl: string, parserType: ParserType) {
       return;
     }
 
+    // Clean up previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     setLoading(true);
     setError(null);
 
-    // Check cache first
+    // Check cache first with TTL
     const cacheKey = `${csvUrl}-${parserType}`;
-    if (csvCache.has(cacheKey)) {
-      csvCache
-        .get(cacheKey)!
-        .then((cachedData) => {
-          setData(cachedData);
-          setLoading(false);
-        })
-        .catch((err) => {
-          if (err.name !== "AbortError" && err.message !== "Request aborted") {
-            setError(err instanceof Error ? err.message : "Cache error");
-          }
-          setLoading(false);
-        });
+    const cachedEntry = csvCache.get(cacheKey);
+    const now = Date.now();
+
+    if (cachedEntry && now - cachedEntry.timestamp < CACHE_TTL) {
+      setData(cachedEntry.data);
+      setLoading(false);
       return;
     }
 
-    // Create new fetch promise and cache it only if successful
-    const fetchPromise = fetch(csvUrl)
+    // Clean up expired cache entries
+    for (const [key, entry] of csvCache.entries()) {
+      if (now - entry.timestamp > CACHE_TTL) {
+        csvCache.delete(key);
+      }
+    }
+
+    // Create new fetch promise
+    const fetchPromise = fetch(csvUrl, { signal: abortController.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to fetch CSV: ${res.statusText}`);
         return res.text();
@@ -62,8 +74,11 @@ export function useCsvData(csvUrl: string, parserType: ParserType) {
       .then((csvText) => {
         try {
           const parsedData = parseSheetData(csvText, parserType);
-          // Cache the result only if successful
-          csvCache.set(cacheKey, Promise.resolve(parsedData));
+          // Cache the result with timestamp
+          csvCache.set(cacheKey, {
+            data: parsedData,
+            timestamp: now,
+          });
           return parsedData;
         } catch (parseError: unknown) {
           const errorMessage =
@@ -75,23 +90,31 @@ export function useCsvData(csvUrl: string, parserType: ParserType) {
         if (err.name !== "AbortError" && err.message !== "Request aborted") {
           const errorMessage =
             err instanceof Error ? err.message : "Network error";
-          setError(errorMessage);
+          throw new Error(errorMessage);
         }
-        // Do not cache or return anything here
+        throw err;
       });
 
     fetchPromise
       .then((parsedData) => {
-        if (parsedData) setData(parsedData);
+        if (!abortController.signal.aborted && parsedData) {
+          setData(parsedData);
+        }
       })
       .catch((err) => {
-        if (err.name !== "AbortError" && err.message !== "Request aborted") {
+        if (!abortController.signal.aborted) {
           setError(err instanceof Error ? err.message : "Network error");
         }
       })
       .finally(() => {
-        setLoading(false);
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      abortController.abort();
+    };
   }, [csvUrl, parserType]);
 
   return { data, loading, error };
@@ -117,7 +140,7 @@ function parseSheetData(
   const rows = parsed.data;
 
   switch (parserType) {
-    case "shareChart":
+    case "shareChart": //check if needed
       return parseMediaShareBar(rows);
     case "shareChartExtended":
       return parseShareChartExtended(rows);
@@ -132,11 +155,13 @@ function parseSheetData(
     case "map":
       return parseMapData(rows);
     case "barChart":
-      return parseCategoryStats(rows);
+      return parseBarChartVerticalStacked(rows);
     case "widgetChart":
       return parseWidgetStats(rows);
     case "pieChart":
       return parsePieChart(rows);
+    case "heatmap":
+      return parseHeatmapData(rows);
   }
   throw new Error(`Unhandled parserType: ${parserType}`);
 }
@@ -294,10 +319,21 @@ function parseMonthlyStats(rows: string[][]): ParsedSheetData {
 function parseMonthlyStatsForTimeSeries(rows: string[][]): ParsedSheetData {
   const headerTitle = rows[0]?.[0]?.trim() || "";
 
-  // Dynamically get all dataset labels after the date column
-  const datasetLabels = rows[1]
-    .slice(1)
-    .map((label, i) => label?.trim() || `Series ${i + 1}`);
+  // Dynamically get all dataset labels after the date column (beyond column D)
+  const datasetLabels: string[] = [];
+  for (let i = 1; i < rows[1].length; i++) {
+    const label = rows[1]?.[i]?.trim();
+    if (label) {
+      datasetLabels.push(label);
+    }
+  }
+
+  // If no labels found, create default ones
+  if (datasetLabels.length === 0) {
+    for (let i = 1; i < rows[1].length; i++) {
+      datasetLabels.push(`Series ${i}`);
+    }
+  }
 
   const dateLabels: string[] = [];
   const seriesData: { x: string; y: number | null }[][] = datasetLabels.map(
@@ -327,43 +363,63 @@ function parseMonthlyStatsForTimeSeries(rows: string[][]): ParsedSheetData {
   };
 }
 
-// Category stats parser
-function parseCategoryStats(rows: string[][]): ParsedSheetData {
-  const headerTitle = rows[1]?.[5]?.trim() || "";
+// Bar chart vertical stacked parser
+function parseBarChartVerticalStacked(rows: string[][]): ParsedSheetData {
+  // Header from cell M1 (index 12)
+  const headerTitle = rows[0]?.[12]?.trim() || "";
 
-  const datasetLabels = [
-    rows[1]?.[1]?.trim() || "Series 1",
-    rows[1]?.[2]?.trim() || "Series 2",
-    rows[1]?.[3]?.trim() || "Series 3",
-  ];
-
+  // Get horizontal axis labels from row 2, columns B through I (indices 1-8)
   const categoryLabels: string[] = [];
-  const seriesData: number[][] = [[], [], []];
+  for (let i = 1; i <= 8; i++) {
+    const label = rows[1]?.[i]?.trim(); // Row 2 (index 1)
+    if (label) {
+      categoryLabels.push(label);
+    }
+  }
 
+  // Get dataset labels from column A, starting from row 3
+  const datasetLabels: string[] = [];
+  for (let i = 2; i < rows.length; i++) {
+    const label = rows[i]?.[0]?.trim(); // Column A
+    if (label) {
+      datasetLabels.push(label);
+    }
+  }
+
+  // If no labels found, create default ones
+  if (datasetLabels.length === 0) {
+    for (let i = 0; i < 8; i++) {
+      datasetLabels.push(`Series ${i + 1}`);
+    }
+  }
+
+  const seriesData: number[][] = [];
+
+  // Initialize series data arrays
+  for (let i = 0; i < datasetLabels.length; i++) {
+    seriesData.push([]);
+  }
+
+  // Process data rows starting from row 3
   const dataRows = rows.slice(2);
-  dataRows.forEach((row) => {
-    const categoryLabel = row[0]?.trim();
-
-    if (categoryLabel) {
-      categoryLabels.push(categoryLabel);
-
-      const valueB = parseFloat(row[1]) || 0;
-      const valueC = parseFloat(row[2]) || 0;
-      const valueD = parseFloat(row[3]) || 0;
-
-      seriesData[0].push(isNaN(valueB) ? 0 : valueB);
-      seriesData[1].push(isNaN(valueC) ? 0 : valueC);
-      seriesData[2].push(isNaN(valueD) ? 0 : valueD);
+  dataRows.forEach((row, rowIndex) => {
+    // Process columns B through I (indices 1-8) for each series
+    for (
+      let colIndex = 1;
+      colIndex <= 8 && colIndex <= categoryLabels.length;
+      colIndex++
+    ) {
+      const value = parseFloat(row[colIndex]) || 0;
+      seriesData[rowIndex].push(isNaN(value) ? 0 : value);
     }
   });
 
   const chartData: ChartData = {
     labels: categoryLabels,
-    datasets: [
-      { data: seriesData[0], label: datasetLabels[0] },
-      { data: seriesData[1], label: datasetLabels[1] },
-      { data: seriesData[2], label: datasetLabels[2] },
-    ],
+    datasets: datasetLabels.map((label, index) => ({
+      data: seriesData[index] || [],
+      label,
+    })),
   };
 
   return {
@@ -518,5 +574,56 @@ function parsePieChart(rows: string[][]): ParsedSheetData {
   return {
     headerTitle,
     chartData,
+  };
+}
+
+// Heatmap parser - converts monthly data to heatmap format
+function parseHeatmapData(rows: string[][]): ParsedSheetData {
+  if (rows.length < 3) {
+    return {
+      headerTitle: "",
+      chartData: { labels: [], datasets: [] },
+    };
+  }
+
+  // Get header title from cell H2 (row 1, column 7)
+  const headerTitle = rows[1]?.[11]?.trim() || "";
+
+  // Get media type labels from row 1, columns B-I (skip column A)
+  const mediaTypes = rows[1]
+    .slice(1, 9)
+    .filter((label) => label && label.trim());
+
+  // Get dates from row 2, column A (all data rows)
+  const dataRows = rows.slice(3); // Start from row 3 (index 2)
+  const dates = dataRows
+    .map((row) => row[0]?.trim())
+    .filter((date) => date && date.includes("-"));
+
+  // Create datasets for each media type (only columns B-I)
+  const datasets = mediaTypes.map((mediaType, mediaIndex) => {
+    const data = dataRows
+      .map((row) => {
+        const value = parseFloat(row[mediaIndex + 1]); // +1 because we start from column B
+        return {
+          x: row[0]?.trim() || "", // Date as x value
+          y: !isNaN(value) ? value : 0,
+        };
+      })
+      .filter((item) => item.x); // Only include rows with valid dates
+
+    return {
+      label: mediaType,
+      data: data,
+    };
+  });
+
+  return {
+    headerTitle,
+    chartData: {
+      labels: dates, // Use dates as labels
+      datasets: datasets,
+    },
+    heatmapData: [], // Keep for backward compatibility
   };
 }

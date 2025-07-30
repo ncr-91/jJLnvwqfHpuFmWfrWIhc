@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import LoadingBlock from "./LoadingBlock";
 
 interface ChartTimeSeriesMenuProps {
   value: "daily" | "weekly" | "monthly";
@@ -43,20 +44,20 @@ function ChartTimeSeriesMenu({
   return (
     <div className="relative" ref={dropdownRef}>
       {loading ? (
-        <span className="inline-block h-8 w-28 bg-frost-gray-200 rounded animate-pulse" />
+        <LoadingBlock size="custom" height="h-8" width="w-28" />
       ) : (
         <button
           type="button"
           onClick={() => {
             if (!loading) setOpen((prev) => !prev);
           }}
-          className="flex items-center px-4 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium text-sm focus:outline-none hover:bg-teal-50 hover:text-teal-700 transition-colors min-w-[90px]"
+          className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg border transition-colors bg-white border-frost-gray-200 text-frost-gray-900 hover:bg-teal-50 hover:text-teal-800 focus:outline-none"
           disabled={loading}
         >
-          {selected?.label || "Select"}
-          <span className="material-symbols-outlined text-sm ml-1">
-            expand_more
+          <span className="text-xs font-medium">
+            {selected?.label || "Select"}
           </span>
+          <span className="material-symbols-outlined text-sm">expand_more</span>
         </button>
       )}
       {open && !loading && (
@@ -68,9 +69,9 @@ function ChartTimeSeriesMenu({
                 onChange(v.value as "daily" | "weekly" | "monthly");
                 setOpen(false);
               }}
-              className={`w-full text-left px-4 py-2 text-sm transition-colors duration-75 ${
+              className={`w-full text-left px-4 py-2 text-xs font-medium text-frost-gray-900 transition-colors duration-75 ${
                 value === v.value
-                  ? "bg-teal-100 text-teal-800 font-medium"
+                  ? "bg-teal-100 text-teal-800"
                   : "hover:bg-teal-50 hover:text-teal-700"
               }`}
             >

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import LoadingBlock from "./CardElements/LoadingBlock";
 import WidgetHeader from "./CardElements/WidgetHeader";
 
 import type { CardConfig } from "../config/cardConfigs";
@@ -119,7 +120,7 @@ const WidgetMapCard: React.FC<WidgetMapCardProps> = ({ config }) => {
       )}
       <div className="flex-1 min-h-0 flex flex-col overflow-x-auto px-5 pt-5 pb-5">
         {loading ? (
-          <div className="w-full h-full bg-frost-gray-200 rounded animate-pulse" />
+          <LoadingBlock size="custom" height="h-full" width="w-full" />
         ) : error ? (
           <div className="text-red-500">Error: {error}</div>
         ) : (
@@ -128,8 +129,8 @@ const WidgetMapCard: React.FC<WidgetMapCardProps> = ({ config }) => {
               width: "100%",
               maxWidth: "100%",
               aspectRatio: "4 / 3",
-              minHeight: 155,
-              maxHeight: 365,
+              minHeight: 150,
+              maxHeight: 360,
               position: "relative",
               display: "flex",
               alignItems: "flex-start",

@@ -1,4 +1,5 @@
 import React from "react";
+import LoadingBlock from "./LoadingBlock";
 
 export interface ChartToggleOption {
   value: string;
@@ -33,23 +34,23 @@ const ChartTypeToggle: React.FC<ChartTypeToggleProps> = ({
   const nextOption = options[nextIndex];
 
   return (
-    <>
+    <div className="relative">
       {loading ? (
-        <span className="inline-block h-8 w-28 bg-frost-gray-200 rounded animate-pulse" />
+        <LoadingBlock size="custom" height="h-8" width="w-28" />
       ) : (
         <button
           type="button"
           onClick={onToggle}
           disabled={loading}
-          className={`flex items-center px-4 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium text-sm focus:outline-none hover:bg-teal-50 hover:text-teal-700 transition-colors ${className}`}
+          className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg border transition-colors bg-white border-frost-gray-200 text-frost-gray-900 hover:bg-teal-50 hover:text-teal-800 focus:outline-none ${className}`}
         >
-          <span className="material-symbols-outlined text-sm mr-1">
+          <span className="material-symbols-outlined text-sm">
             {nextOption?.icon}
           </span>
-          {nextOption?.label}
+          <span className="text-xs font-medium">{nextOption?.label}</span>
         </button>
       )}
-    </>
+    </div>
   );
 };
 

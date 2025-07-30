@@ -1,18 +1,16 @@
 import { memo, useMemo } from "react";
+import LoadingBlock from "../components/CardElements/LoadingBlock";
 import LineChart from "./LineChart";
 import BarChart from "./BarChart";
 import PieChart from "./PieChart";
-type ChartType = string;
 
 interface ChartContainerProps {
-  id?: string;
+  id: string;
   loading: boolean;
   chartData: any;
-  type: ChartType;
-  width?: number;
-  height?: number;
+  type: "line" | "bar" | "pie";
   view?: "daily" | "weekly" | "monthly";
-  direction?: "vertical" | "horizontal";
+  direction?: "horizontal" | "vertical";
   percent?: boolean;
   stacked?: boolean;
   showChartLegend?: boolean;
@@ -34,7 +32,6 @@ const ChartContainer = memo(
     loading,
     chartData,
     type,
-
     view,
     direction,
     percent,
@@ -51,16 +48,62 @@ const ChartContainer = memo(
     pieChartCutout,
     pieChartType,
   }: ChartContainerProps) => {
+    // Memoize chart data to prevent unnecessary re-renders
     const memoizedChartData = useMemo(() => {
       if (!chartData) return null;
       return chartData;
     }, [chartData]);
 
-    if (loading) {
+    // Memoize loading state to prevent unnecessary re-renders
+    const isLoading = useMemo(() => loading, [loading]);
+
+    // Memoize chart props to prevent unnecessary re-renders
+    const chartProps = useMemo(
+      () => ({
+        id,
+        data: memoizedChartData,
+        direction,
+        percent,
+        stacked,
+        showChartLegend,
+        legendPosition,
+        showChartGridlineX,
+        showChartGridlineY,
+        showChartLabelsX,
+        showChartLabelsY,
+        view,
+        xAxisType,
+        tooltipMode,
+        showLineChartGradient,
+        pieChartCutout,
+        pieChartType,
+      }),
+      [
+        id,
+        memoizedChartData,
+        direction,
+        percent,
+        stacked,
+        showChartLegend,
+        legendPosition,
+        showChartGridlineX,
+        showChartGridlineY,
+        showChartLabelsX,
+        showChartLabelsY,
+        view,
+        xAxisType,
+        tooltipMode,
+        showLineChartGradient,
+        pieChartCutout,
+        pieChartType,
+      ]
+    );
+
+    if (isLoading) {
       return (
         <div className="h-full w-full overflow-hidden">
-          <div className="w-full h-full mt-5 pb-10 px-5 pb-5">
-            <div className="w-full h-full bg-frost-gray-200 rounded animate-pulse" />
+          <div className="w-full h-full px-5 pb-5 pt-8">
+            <LoadingBlock size="custom" height="h-full" width="w-full" />
           </div>
         </div>
       );
@@ -78,48 +121,11 @@ const ChartContainer = memo(
     return (
       <div className="h-full w-full overflow-hidden">
         {type === "bar" ? (
-          <BarChart
-            id={id}
-            data={memoizedChartData}
-            direction={direction}
-            percent={percent}
-            stacked={stacked}
-            showChartLegend={showChartLegend}
-            legendPosition={legendPosition}
-            showChartGridlineX={showChartGridlineX}
-            showChartGridlineY={showChartGridlineY}
-            showChartLabelsX={showChartLabelsX}
-            showChartLabelsY={showChartLabelsY}
-          />
+          <BarChart {...chartProps} />
         ) : type === "pie" ? (
-          <PieChart
-            id={id}
-            data={memoizedChartData}
-            percent={percent}
-            showChartLegend={showChartLegend}
-            legendPosition={legendPosition}
-            showChartGridlineX={showChartGridlineX}
-            showChartGridlineY={showChartGridlineY}
-            showChartLabelsX={showChartLabelsX}
-            showChartLabelsY={showChartLabelsY}
-            cutout={pieChartType === "donut" ? pieChartCutout || 20 : 0}
-            stacked={stacked}
-          />
+          <PieChart {...chartProps} />
         ) : (
-          <LineChart
-            data={memoizedChartData}
-            showChartLegend={showChartLegend}
-            showChartGridlineX={showChartGridlineX}
-            showChartGridlineY={showChartGridlineY}
-            showLineChartGradient={showLineChartGradient}
-            showChartLabelsX={showChartLabelsX}
-            showChartLabelsY={showChartLabelsY}
-            xAxisType={xAxisType}
-            view={view}
-            tooltipMode={tooltipMode}
-            legendPosition={legendPosition}
-            percent={percent}
-          />
+          <LineChart {...chartProps} />
         )}
       </div>
     );
