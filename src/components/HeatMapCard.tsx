@@ -53,11 +53,9 @@ const SingleHeatMapCard = memo(
     const legendItems = useMemo(
       () => [
         { color: "#f0fdfc", label: "None" },
-        { color: "#ccfbf1", label: "Very Low" },
-        { color: "#5eead4", label: "Low" },
+        { color: "#ccfbf1", label: "Low" },
         { color: "#00a89e", label: "Medium" },
-        { color: "#0d9488", label: "High" },
-        { color: "#134e4a", label: "Very High" },
+        { color: "#134e4a", label: "High" },
       ],
       []
     );
@@ -91,7 +89,6 @@ const SingleHeatMapCard = memo(
         const date = new Date(dateStr);
         return date.toLocaleDateString("en-US", {
           month: "short",
-          year: "numeric",
         });
       });
 
@@ -129,14 +126,12 @@ const SingleHeatMapCard = memo(
       return Math.min(value / maxValue, 1);
     }, []);
 
-    // Teal gradient with 5 levels - improved with #00a89e as medium
+    // Teal gradient with 4 levels - improved with #00a89e as medium
     const getColor = useCallback((intensity: number) => {
       if (intensity === 0) return "#f0fdfc"; // None - very light teal
-      if (intensity < 0.2) return "#ccfbf1"; // Very Low - light teal
-      if (intensity < 0.4) return "#5eead4"; // Low - medium light teal
-      if (intensity < 0.6) return "#00a89e"; // Medium - your specified color
-      if (intensity < 0.8) return "#0d9488"; // High - darker teal
-      return "#134e4a"; // Very High - darkest teal
+      if (intensity < 0.33) return "#ccfbf1"; // Low - light teal
+      if (intensity < 0.66) return "#00a89e"; // Medium - your specified color
+      return "#134e4a"; // High - darkest teal
     }, []);
 
     // Get max value for color scaling
@@ -226,9 +221,9 @@ const SingleHeatMapCard = memo(
                     <div className="h-full w-full flex flex-col">
                       {/* Y-axis labels */}
                       <div className="flex">
-                        <div className="w-38 flex-shrink-0"></div>
+                        <div className="w-36 flex-shrink-0"></div>
                         <div
-                          className="flex-1 grid gap-1"
+                          className="flex-1 grid gap-1 pr-2"
                           style={{
                             gridTemplateColumns: `repeat(${heatMapData.xLabels.length}, minmax(20px, 1fr))`,
                           }}
@@ -237,7 +232,7 @@ const SingleHeatMapCard = memo(
                             (label: string, index: number) => (
                               <div
                                 key={index}
-                                className="text-xs font-medium text-frost-gray-700 text-center py-1 truncate"
+                                className="text-xs font-medium text-frost-gray-700 text-center py-1 truncate flex items-center justify-center"
                                 title={label}
                               >
                                 {label}
@@ -250,16 +245,18 @@ const SingleHeatMapCard = memo(
                       {/* Heatmap grid */}
                       <div className="flex-1 flex">
                         {/* Y-axis labels */}
-                        <div className="w-38 flex-shrink-0 flex flex-col">
+                        <div className="w-36 flex-shrink-0 flex flex-col">
                           {heatMapData.yLabels.map(
                             (label: string, index: number) => (
                               <div
                                 key={index}
-                                className="text-xs font-medium text-frost-gray-700 text-right pr-2 flex items-center justify-end truncate"
+                                className="text-xs font-medium text-frost-gray-700 text-right pr-2 flex items-center justify-end overflow-hidden"
                                 title={label}
                                 style={{ height: "100%" }}
                               >
-                                {label}
+                                <span className="truncate block w-full">
+                                  {label}
+                                </span>
                               </div>
                             )
                           )}
@@ -267,7 +264,7 @@ const SingleHeatMapCard = memo(
 
                         {/* Heatmap cells */}
                         <div
-                          className="flex-1 grid gap-1"
+                          className="flex-1 grid gap-1 pr-2"
                           style={{
                             gridTemplateColumns: `repeat(${heatMapData.xLabels.length}, minmax(20px, 1fr))`,
                             gridTemplateRows: `repeat(${heatMapData.yLabels.length}, 1fr)`,
@@ -292,7 +289,7 @@ const SingleHeatMapCard = memo(
 
                                     {/* Tooltip */}
                                     <div
-                                      className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10"
+                                      className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10"
                                       style={{
                                         backgroundColor: "var(--color-white)",
                                         color: "var(--color-gray-500)",
@@ -303,9 +300,24 @@ const SingleHeatMapCard = memo(
                                         boxShadow:
                                           "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
                                         fontFamily: '"Inter", sans-serif',
-                                        fontSize: "11px",
+                                        fontSize: "12px",
                                         fontWeight: "500",
-                                        lineHeight: "1.2",
+                                        lineHeight: "1.1",
+                                        left:
+                                          xIndex >=
+                                          heatMapData.xLabels.length - 2
+                                            ? "auto"
+                                            : "50%",
+                                        right:
+                                          xIndex >=
+                                          heatMapData.xLabels.length - 2
+                                            ? "0"
+                                            : "auto",
+                                        transform:
+                                          xIndex >=
+                                          heatMapData.xLabels.length - 2
+                                            ? "none"
+                                            : "translateX(-50%)",
                                       }}
                                     >
                                       <div
