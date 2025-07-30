@@ -36,7 +36,7 @@ export function useCentralizedDataFetching() {
       const urlGroups = new Map<string, FetchRequest[]>();
 
       for (const [key, requests] of requestQueue.entries()) {
-        const [url, parserType] = key.split("|");
+        const [url] = key.split("|");
         if (!urlGroups.has(url)) {
           urlGroups.set(url, []);
         }

@@ -123,9 +123,10 @@ const SingleStatCard = memo(
         <div className="flex-1 min-h-0 -mt-5 -mb-3 flex flex-col">
           {viewMode === "chart" ? (
             <ChartContainer
+              id={config.id}
               loading={loading}
               chartData={loading ? undefined : data?.chartData}
-              type={chartType as string}
+              type={chartType as "pie" | "bar" | "line"}
               direction={config.BarChartDirection}
               percent={config.BarChartPercent}
               stacked={config.BarChartStacked}

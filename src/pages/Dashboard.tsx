@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { cardConfigs, cardSizeClasses } from "../config/cardConfigs";
-import type { CardConfig } from "../config/cardConfigs";
+
 import StatCard from "../components/StatCard";
 import ChartCard from "../components/ChartCard";
 import TableCard from "../components/TableCard";
