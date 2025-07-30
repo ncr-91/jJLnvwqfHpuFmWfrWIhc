@@ -38,13 +38,7 @@ interface SingleHeatMapCardProps {
 const SingleHeatMapCard = memo(
   ({ data, loading, error, config }: SingleHeatMapCardProps) => {
     const [viewMode, setViewMode] = useState<"heatmap" | "table">("heatmap");
-    const [tooltip, setTooltip] = useState<{
-      show: boolean;
-      x: number;
-      y: number;
-      content: string;
-    }>({ show: false, x: 0, y: 0, content: "" });
-    const { chartType, size, rowSpan } = config;
+    const { size, rowSpan } = config;
     const legendRef = useRef<HTMLUListElement>(null);
     const sizeClass = cardSizeClasses[size || "sm"];
     const rowSpanClass = rowSpan ? `row-span-${rowSpan}` : "";
@@ -97,7 +91,7 @@ const SingleHeatMapCard = memo(
         const dataset = datasets.find((d: any) => d.label === mediaType);
         if (!dataset) return dates.map(() => 0);
 
-        return dates.map((dateStr: string, index: number) => {
+        return dates.map((dateStr: string) => {
           const dataPoint = dataset.data.find((d: any) => d.x === dateStr);
           return dataPoint?.y || 0;
         });
@@ -139,26 +133,6 @@ const SingleHeatMapCard = memo(
       if (!heatMapData.data.length) return 0;
       return Math.max(...heatMapData.data.flat());
     }, [heatMapData.data]);
-
-    // Tooltip handlers
-    const handleMouseEnter = useCallback(
-      (value: number, xLabel: string, yLabel: string, x: number, y: number) => {
-        const intensity = getColorIntensity(value, maxValue);
-        const percentage = maxValue > 0 ? (intensity * 100).toFixed(1) : 0;
-
-        setTooltip({
-          show: true,
-          x,
-          y,
-          content: `${xLabel}: ${yLabel} = ${value.toLocaleString()}\n${percentage}% of max`,
-        });
-      },
-      [getColorIntensity, maxValue]
-    );
-
-    const handleMouseLeave = useCallback(() => {
-      setTooltip({ show: false, x: 0, y: 0, content: "" });
-    }, []);
 
     if (error) return <div className="text-red-500">Error: {error}</div>;
 

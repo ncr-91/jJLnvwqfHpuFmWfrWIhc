@@ -28,10 +28,7 @@ function PieChart({
   percent = false,
   showChartLegend = false,
   legendPosition = "bottom",
-  showChartLabelsX = true,
-  showChartLabelsY = true,
-  showChartGridlineX = false,
-  showChartGridlineY = false,
+
   cutout = 0,
 }: PieChartProps) {
   const [chart, setChart] = useState<Chart<"pie"> | null>(null);
