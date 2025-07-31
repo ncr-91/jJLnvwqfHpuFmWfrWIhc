@@ -1,0 +1,94 @@
+{
+  "hash": "6e1db66b",
+  "configHash": "a416a4f2",
+  "lockfileHash": "09740d17",
+  "browserHash": "a4d2eada",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "090ad509",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "a3f5d809",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "da7222cb",
+      "needsInterop": false
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "8cfa7b93",
+      "needsInterop": true
+    },
+    "react-australia-map": {
+      "src": "../../node_modules/react-australia-map/lib/index.js",
+      "file": "react-australia-map.js",
+      "fileHash": "e2266210",
+      "needsInterop": true
+    },
+    "jsheatmap": {
+      "src": "../../node_modules/jsheatmap/lib/index.js",
+      "file": "jsheatmap.js",
+      "fileHash": "fe9c9c09",
+      "needsInterop": false
+    },
+    "date-fns": {
+      "src": "../../node_modules/date-fns/index.js",
+      "file": "date-fns.js",
+      "fileHash": "2b3e80b6",
+      "needsInterop": false
+    },
+    "clsx": {
+      "src": "../../node_modules/clsx/dist/clsx.mjs",
+      "file": "clsx.js",
+      "fileHash": "e754511b",
+      "needsInterop": false
+    },
+    "tailwind-merge": {
+      "src": "../../node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+      "file": "tailwind-merge.js",
+      "fileHash": "bd851d6e",
+      "needsInterop": false
+    },
+    "papaparse": {
+      "src": "../../node_modules/papaparse/papaparse.min.js",
+      "file": "papaparse.js",
+      "fileHash": "d88064b7",
+      "needsInterop": true
+    },
+    "chart.js": {
+      "src": "../../node_modules/chart.js/dist/chart.js",
+      "file": "chart__js.js",
+      "fileHash": "2969a3ad",
+      "needsInterop": false
+    },
+    "chartjs-adapter-moment": {
+      "src": "../../node_modules/chartjs-adapter-moment/dist/chartjs-adapter-moment.esm.js",
+      "file": "chartjs-adapter-moment.js",
+      "fileHash": "c757d62f",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-YBURIK6U": {
+      "file": "chunk-YBURIK6U.js"
+    },
+    "chunk-WN7W3SD2": {
+      "file": "chunk-WN7W3SD2.js"
+    },
+    "chunk-RCGQOTJJ": {
+      "file": "chunk-RCGQOTJJ.js"
+    },
+    "chunk-7D4SUZUM": {
+      "file": "chunk-7D4SUZUM.js"
+    }
+  }
+}
