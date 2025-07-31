@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import CandaIcon from "../assets/images/canda_icon.png";
 
 function Header() {
   const [isRainbow, setIsRainbow] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Check if we should start animation on page load
   useEffect(() => {
@@ -19,7 +20,9 @@ function Header() {
   const handleIconClick = () => {
     // Set flag for animation on next page load
     sessionStorage.setItem("rainbowAnimation", "true");
-    // Refresh immediately
+    // Store current path to restore after refresh
+    sessionStorage.setItem("currentPath", location.pathname);
+    // Refresh the page
     window.location.reload();
   };
 
