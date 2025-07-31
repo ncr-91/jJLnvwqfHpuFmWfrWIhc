@@ -44,7 +44,7 @@ function LineChart({
   const chartRef = useRef<Chart<"line"> | null>(null);
   const hasRendered = useRef(false);
 
-  const customLegendRef = useRef<HTMLUListElement | null>(null);
+  const customLegendRef = useRef<HTMLUListElement>(null);
 
   // Calculate percentage data if percent mode is enabled
   const chartData = useMemo(() => {

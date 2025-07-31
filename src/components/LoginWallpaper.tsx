@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 const DataTextureWallpaper = () => {
-  const nodesRef = useRef(null);
-  const connectionsRef = useRef(null);
-  const streamsRef = useRef(null);
-  const shapesRef = useRef(null);
+  const nodesRef = useRef<HTMLDivElement>(null);
+  const connectionsRef = useRef<HTMLDivElement>(null);
+  const streamsRef = useRef<HTMLDivElement>(null);
+  const shapesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Generate random data nodes
@@ -110,7 +110,7 @@ const DataTextureWallpaper = () => {
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         @keyframes gridPulse {
           0%, 100% { opacity: 0.1; }
           50% { opacity: 0.2; }

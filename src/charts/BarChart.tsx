@@ -38,7 +38,7 @@ function BarChart({
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   const canvas = useRef<HTMLCanvasElement>(null);
-  const legend = useRef<HTMLUListElement | null>(null);
+  const legend = useRef<HTMLUListElement>(null);
 
   const normalizedData = useMemo(() => {
     if (!stacked || percent || direction === "vertical") return data;

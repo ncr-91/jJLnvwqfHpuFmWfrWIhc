@@ -2,12 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "/src/assets/css/global.css";
 import CompanyLogo from "/src/assets/images/canda_logo_stacked_light.png";
-import DataTextureWallpaper from "/src/components/LoginWallpaper";
+import DataTextureWallpaper from "../components/LoginWallpaper";
 
 export default function Login() {
   const navigate = useNavigate();
 
-  const handleSignIn = (e) => {
+  const handleSignIn = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Perform authentication logic here
     navigate("/dashboard"); // Redirect to dashboard after login

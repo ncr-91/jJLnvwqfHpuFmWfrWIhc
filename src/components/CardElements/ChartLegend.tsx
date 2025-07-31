@@ -7,7 +7,7 @@ export interface ChartLegendPluginOptions {
 }
 
 export const createChartLegendPlugin = (
-  legendRef: React.RefObject<HTMLUListElement>,
+  legendRef: React.RefObject<HTMLUListElement | null>,
   options: ChartLegendPluginOptions
 ): Plugin => {
   const { chartType, onVisibilityChange } = options;
@@ -200,7 +200,7 @@ export const createChartLegendPlugin = (
           { color: "#134e4a", label: "High" },
         ];
 
-        items.forEach((item, index) => {
+        items.forEach((item) => {
           const li = document.createElement("li");
           li.style.margin = "4px";
 
@@ -266,11 +266,7 @@ export const createChartLegendPlugin = (
         // Pie chart legend
         const labels = chart.data.labels || [];
         const dataset = chart.data.datasets[0];
-        const chartInstance = chart as any;
-        const sliceVisibility =
-          chartInstance._sliceVisibility || new Array(labels.length).fill(true);
-
-        labels.forEach((label, index) => {
+        labels.forEach((_label, index) => {
           const li = createLegendItem(chart, dataset, index);
           ul.appendChild(li);
         });
