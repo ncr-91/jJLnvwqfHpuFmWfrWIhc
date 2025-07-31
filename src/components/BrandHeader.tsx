@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import CandaIcon from "../assets/images/canda_icon.png";
 
 function Header() {
   const [isRainbow, setIsRainbow] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Check if we should start animation on page load
   useEffect(() => {

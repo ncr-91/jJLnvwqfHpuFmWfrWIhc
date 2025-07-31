@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense, useEffect } from "react";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
@@ -11,7 +11,7 @@ const Category = lazy(() => import("./pages/Category"));
 // Component to handle path restoration after refresh
 function PathRestorer() {
   const location = useLocation();
-  
+
   useEffect(() => {
     // If we're on the login page and have a stored path, redirect to it
     if (location.pathname === "/" && sessionStorage.getItem("currentPath")) {
