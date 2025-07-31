@@ -1,13 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { chartColors } from "../utils/ChartjsConfig";
-import {
-  Chart,
-  type ChartData,
-  type ChartOptions,
-  type Plugin,
-  type TooltipItem,
-} from "chart.js";
-import { formatValue } from "../utils/utils";
+import { Chart, type ChartData, type ChartOptions } from "chart.js";
 import { createChartLegendPlugin } from "../components/CardElements/ChartLegend";
 import {
   createPieChartTooltipCallbacks,

@@ -1,11 +1,6 @@
 import { useRef, useEffect, useMemo } from "react";
 import { chartColors } from "../utils/ChartjsConfig.tsx";
-import {
-  Chart,
-  type ChartData,
-  type ChartOptions,
-  type Plugin,
-} from "chart.js";
+import { Chart, type ChartData, type ChartOptions } from "chart.js";
 import "chartjs-adapter-moment";
 import { formatValue } from "../utils/utils";
 import { parseISO, format, getISOWeek } from "date-fns";
@@ -49,7 +44,7 @@ function LineChart({
   const chartRef = useRef<Chart<"line"> | null>(null);
   const hasRendered = useRef(false);
 
-  const customLegendRef = useRef<HTMLUListElement>(null);
+  const customLegendRef = useRef<HTMLUListElement | null>(null);
 
   // Calculate percentage data if percent mode is enabled
   const chartData = useMemo(() => {

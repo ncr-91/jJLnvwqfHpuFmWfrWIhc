@@ -1,18 +1,12 @@
 import { useRef, useEffect, useState, useMemo } from "react";
 import { chartColors } from "../utils/ChartjsConfig";
-import {
-  Chart,
-  type ChartData,
-  type ChartOptions,
-  type Plugin,
-  type TooltipItem,
-} from "chart.js";
-import { formatValue } from "../utils/utils";
+import { Chart, type ChartData, type ChartOptions } from "chart.js";
 import { createChartLegendPlugin } from "../components/CardElements/ChartLegend";
 import {
   createBarChartTooltipCallbacks,
   getChartTooltipColors,
 } from "../components/CardElements/ChartTooltip";
+import { formatValue } from "../utils/utils";
 
 interface BarChartStackedProps {
   id?: string;
@@ -44,7 +38,7 @@ function BarChart({
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   const canvas = useRef<HTMLCanvasElement>(null);
-  const legend = useRef<HTMLUListElement>(null);
+  const legend = useRef<HTMLUListElement | null>(null);
 
   const normalizedData = useMemo(() => {
     if (!stacked || percent || direction === "vertical") return data;
@@ -164,7 +158,7 @@ function BarChart({
 
     const htmlLegendPlugin = createChartLegendPlugin(legend, {
       chartType: "bar",
-      onVisibilityChange: (index, isVisible) => {
+      onVisibilityChange: (_index, _isVisible) => {
         if (
           stacked &&
           direction === "horizontal" &&
