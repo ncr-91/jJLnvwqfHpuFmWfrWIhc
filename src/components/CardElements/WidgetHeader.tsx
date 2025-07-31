@@ -22,7 +22,7 @@ const WidgetHeader: React.FC<WidgetHeaderProps> = ({
         ) : (
           <div className="flex items-center gap-2">
             <div>
-              <h2 className="text-md font-semibold text-oxford-blue-600 leading-tight">
+              <h2 className="text-md font-semibold text-oxford-blue-900 leading-tight">
                 {title}
               </h2>
               <div className="text-xs text-frost-gray-500 font-medium mt-0.5 h-3">

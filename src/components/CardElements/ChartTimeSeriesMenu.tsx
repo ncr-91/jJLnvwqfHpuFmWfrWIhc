@@ -72,7 +72,7 @@ function ChartTimeSeriesMenu({
               className={`w-full text-left px-4 py-2 text-xs font-medium text-frost-gray-900 transition-colors duration-75 ${
                 value === v.value
                   ? "bg-teal-100 text-teal-800"
-                  : "hover:bg-teal-50 hover:text-teal-700"
+                  : "hover:bg-teal-50 hover:text-teal-800"
               }`}
             >
               {v.label}

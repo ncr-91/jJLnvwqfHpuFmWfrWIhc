@@ -21,7 +21,7 @@ export const tableConfigs: CardConfig[] = [
     id: "creativesCard",
     type: "creative",
     size: "xxl",
-    rowSpan: 2,
+    rowSpan: 3,
     csvUrl: "undefined",
     showCardHeader: true,
     showCardHeaderBorder: false,

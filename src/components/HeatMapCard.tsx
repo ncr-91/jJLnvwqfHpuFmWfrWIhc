@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, useCallback, useRef } from "react";
+import { memo, useMemo, useState, useCallback } from "react";
 import LoadingBlock from "./CardElements/LoadingBlock";
 import { useOptimizedCardData } from "../hooks/useOptimizedCardData";
 import HeaderTitle from "./CardElements/CardHeader";
@@ -6,6 +6,12 @@ import CardActionButton from "./CardElements/CardActionButton";
 import type { CardConfig } from "../config/cardConfigs";
 import { cardSizeClasses } from "../config/cardConfigs";
 import Sterno from "jsheatmap";
+
+import {
+  createHeatmapTooltipContent,
+  getChartTooltipColors,
+} from "./CardElements/ChartTooltip";
+import { chartColors } from "../utils/ChartjsConfig";
 
 interface HeatMapCardProps {
   config: CardConfig;
@@ -39,7 +45,7 @@ const SingleHeatMapCard = memo(
   ({ data, loading, error, config }: SingleHeatMapCardProps) => {
     const [viewMode, setViewMode] = useState<"heatmap" | "table">("heatmap");
     const { size, rowSpan } = config;
-    const legendRef = useRef<HTMLUListElement>(null);
+
     const sizeClass = cardSizeClasses[size || "sm"];
     const rowSpanClass = rowSpan ? `row-span-${rowSpan}` : "";
 
@@ -53,6 +59,9 @@ const SingleHeatMapCard = memo(
       ],
       []
     );
+
+    // Get shared tooltip colors
+    const tooltipColors = getChartTooltipColors(chartColors);
 
     const handleViewModeChange = useCallback(() => {
       setViewMode((prev: "heatmap" | "table") =>
@@ -265,10 +274,10 @@ const SingleHeatMapCard = memo(
                                     <div
                                       className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10"
                                       style={{
-                                        backgroundColor: "var(--color-white)",
-                                        color: "var(--color-gray-500)",
-                                        border:
-                                          "1px solid var(--color-gray-200)",
+                                        backgroundColor:
+                                          tooltipColors.backgroundColor,
+                                        color: tooltipColors.bodyColor,
+                                        border: `1px solid ${tooltipColors.borderColor}`,
                                         borderRadius: "8px",
                                         padding: "8px",
                                         boxShadow:
@@ -294,25 +303,48 @@ const SingleHeatMapCard = memo(
                                             : "translateX(-50%)",
                                       }}
                                     >
-                                      <div
-                                        style={{
-                                          marginBottom: "4px",
-                                          fontWeight: "600",
-                                        }}
-                                      >
-                                        {heatMapData.xLabels[xIndex]}
-                                      </div>
-                                      <div style={{ marginBottom: "4px" }}>
-                                        {heatMapData.yLabels[yIndex]}:{" "}
-                                        {value.toLocaleString()}
-                                      </div>
-                                      <div style={{ marginBottom: "0" }}>
-                                        {intensity > 0
-                                          ? `${(intensity * 100).toFixed(
-                                              1
-                                            )}% of max`
-                                          : "No activity"}
-                                      </div>
+                                      {(() => {
+                                        const tooltipContent =
+                                          createHeatmapTooltipContent({
+                                            xLabels: heatMapData.xLabels,
+                                            yLabels: heatMapData.yLabels,
+                                            xIndex,
+                                            yIndex,
+                                            value,
+                                            intensity,
+                                          });
+
+                                        return (
+                                          <>
+                                            <div
+                                              style={{
+                                                marginBottom: "4px",
+                                                fontWeight: "600",
+                                              }}
+                                            >
+                                              {tooltipContent.title}
+                                            </div>
+                                            {tooltipContent.content.map(
+                                              (line, index) => (
+                                                <div
+                                                  key={index}
+                                                  style={{
+                                                    marginBottom:
+                                                      index <
+                                                      tooltipContent.content
+                                                        .length -
+                                                        1
+                                                        ? "4px"
+                                                        : "0",
+                                                  }}
+                                                >
+                                                  {line}
+                                                </div>
+                                              )
+                                            )}
+                                          </>
+                                        );
+                                      })()}
                                     </div>
                                   </div>
                                 );
@@ -323,13 +355,13 @@ const SingleHeatMapCard = memo(
                     </div>
                   </div>
 
-                  {/* Custom HTML Legend - 5 levels */}
+                  {/* Custom HTML Legend */}
                   <div className="mt-4 flex items-center justify-center">
-                    <ul className="flex items-center space-x-2" ref={legendRef}>
+                    <ul className="flex items-center space-x-2">
                       {legendItems.map((item, index) => (
                         <li key={index} style={{ margin: "4px" }}>
                           <button
-                            className="btn-xs text-sm bg-white border rounded-md border-gray-100 text-frost-gray-500 hover:text-frost-gray-700 rounded-full flex items-center"
+                            className="btn-xs text-sm bg-white border rounded-md border-gray-100 text-gray-500 hover:text-gray-900 rounded-full flex items-center"
                             style={{
                               paddingTop: "2px",
                               paddingBottom: "2px",
@@ -337,33 +369,35 @@ const SingleHeatMapCard = memo(
                               paddingRight: "6px",
                               marginRight: "4px",
                               transition: "background 0.2s, color 0.2s",
-                              fontSize: "0.875rem", // text-sm equivalent
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.background =
-                                "var(--color-teal-100)";
+                                "var(--color-teal-50)";
                               e.currentTarget.style.color =
-                                "var(--color-teal-700)";
+                                "var(--color-teal-800)";
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = "white";
                               e.currentTarget.style.color =
-                                "var(--color-frost-gray-500)";
+                                "var(--color-gray-500)";
                             }}
                           >
                             <span
-                              className="block rounded-full mr-2 flex-shrink-0"
                               style={{
+                                display: "block",
                                 width: "12px",
                                 height: "12px",
+                                borderRadius: "50%",
+                                marginRight: "8px",
                                 borderWidth: "3px",
                                 borderStyle: "solid",
                                 borderColor: item.color,
                                 backgroundColor: "transparent",
-                                borderRadius: "50%",
+                                flexShrink: "0",
+                                pointerEvents: "none",
                               }}
                             />
-                            <span style={{ fontSize: "0.875rem" }}>
+                            <span style={{ pointerEvents: "none" }}>
                               {item.label}
                             </span>
                           </button>

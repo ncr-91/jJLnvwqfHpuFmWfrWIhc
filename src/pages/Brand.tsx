@@ -8,7 +8,6 @@ import CreativesCard from "../components/CreativesCard";
 import WidgetCard from "../components/WidgetCard";
 import WidgetMapCard from "../components/WidgetMapCard";
 import MapCard from "../components/MapCard";
-import BrandHeader from "../components/BrandHeader";
 import HeatMapCard from "../components/HeatMapCard";
 
 const cardOrder = [
@@ -32,7 +31,7 @@ const cardOrder = [
   //"dashboard01", //Media Type Investment
 ];
 
-const Dashboard = () => {
+const Brand = () => {
   // Memoize the config map to prevent recreating it on every render
   const configMap = useMemo(
     () => Object.fromEntries(cardConfigs.map((cfg) => [cfg.id, cfg])),
@@ -107,23 +106,16 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="dashboard">
-      <div className="dashboard wrapper">
-        <main className="grow">
-          <section className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-            <BrandHeader />
-            <div className="grid grid-cols-12 gap-6 auto-rows-[105px]">
-              {cardComponents.map(({ key, className, component }) => (
-                <div key={key} className={className}>
-                  {component}
-                </div>
-              ))}
-            </div>
-          </section>
-        </main>
+    <section className="px-4 sm:px-6 lg:px-8 pt-2 pb-8 w-full max-w-9xl mx-auto">
+      <div className="grid grid-cols-12 gap-6 auto-rows-[105px]">
+        {cardComponents.map(({ key, className, component }) => (
+          <div key={key} className={className}>
+            {component}
+          </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 };
 
-export default Dashboard;
+export default Brand;

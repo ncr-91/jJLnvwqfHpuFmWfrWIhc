@@ -9,6 +9,11 @@ import {
 import "chartjs-adapter-moment";
 import { formatValue } from "../utils/utils";
 import { parseISO, format, getISOWeek } from "date-fns";
+import { createChartLegendPlugin } from "../components/CardElements/ChartLegend";
+import {
+  createLineChartTooltipCallbacks,
+  getChartTooltipColors,
+} from "../components/CardElements/ChartTooltip";
 
 interface LineChartProps {
   data: ChartData<"line">;
@@ -43,7 +48,7 @@ function LineChart({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const chartRef = useRef<Chart<"line"> | null>(null);
   const hasRendered = useRef(false);
-  const { tooltipBodyColor, tooltipBgColor, tooltipBorderColor } = chartColors;
+
   const customLegendRef = useRef<HTMLUListElement>(null);
 
   // Calculate percentage data if percent mode is enabled
@@ -116,93 +121,9 @@ function LineChart({
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
 
-    // Custom HTML legend plugin (if showChartLegend is true)
-    const htmlLegendPlugin: Plugin<"line"> = {
-      id: "htmlLegend",
-      afterUpdate(c) {
-        const ul = customLegendRef.current;
-        if (!ul) return;
-        while (ul.firstChild) {
-          ul.firstChild.remove();
-        }
-        c.data.datasets.forEach((dataset, index) => {
-          const li = document.createElement("li");
-          li.style.margin = "4px";
-          const button = document.createElement("button");
-          button.classList.add(
-            "btn-xs",
-            "text-sm",
-            "bg-white",
-            "border",
-            "rounded-md",
-            "border-gray-100",
-            "text-gray-500",
-            "hover:text-gray-900",
-            "rounded-full"
-          );
-          const isVisible = c.isDatasetVisible(index);
-          button.style.opacity = isVisible ? "1" : ".3";
-          button.style.display = "flex";
-          button.style.alignItems = "center";
-          button.style.paddingTop = "2px";
-          button.style.paddingBottom = "2px";
-          button.style.paddingLeft = "6px";
-          button.style.paddingRight = "6px";
-          button.style.marginRight = "4px";
-          button.style.transition = "background 0.2s, color 0.2s";
-          button.style.background = isVisible
-            ? "white"
-            : "var(--color-teal-50)";
-          button.onmouseenter = () => {
-            button.style.background = "var(--color-teal-100)";
-            button.style.color = "var(--color-teal-700)";
-          };
-          button.onmouseleave = () => {
-            button.style.background = isVisible
-              ? "white"
-              : "var(--color-teal-50)";
-            button.style.color = isVisible
-              ? "var(--color-gray-500)"
-              : "var(--color-gray-400)";
-          };
-          button.onclick = () => {
-            c.setDatasetVisibility(index, !c.isDatasetVisible(index));
-            c.update();
-          };
-          const box = document.createElement("span");
-          box.style.display = "block";
-          box.style.width = "12px";
-          box.style.height = "12px";
-          box.style.borderRadius = "50%";
-          box.style.marginRight = "8px";
-          box.style.borderWidth = "3px";
-          box.style.borderStyle = "solid";
-          box.style.flexShrink = "0";
-          // Prioritize borderColor for line color
-          let color = "#000";
-          if (Array.isArray(dataset.borderColor)) {
-            color = dataset.borderColor[0] as string;
-          } else if (dataset.borderColor) {
-            color = dataset.borderColor as string;
-          } else if (Array.isArray(dataset.backgroundColor)) {
-            color = dataset.backgroundColor[0] as string;
-          } else if (dataset.backgroundColor) {
-            color = dataset.backgroundColor as string;
-          }
-          box.style.borderColor = color;
-          box.style.backgroundColor = "transparent";
-          box.style.pointerEvents = "none";
-          const labelSpan = document.createElement("span");
-          labelSpan.style.pointerEvents = "none";
-          const labelText = dataset.label || `Dataset ${index + 1}`;
-          labelSpan.textContent = labelText;
-          li.appendChild(button);
-          button.appendChild(box);
-          button.appendChild(labelSpan);
-          ul.appendChild(li);
-        });
-      },
-    };
+    const htmlLegendPlugin = createChartLegendPlugin(customLegendRef, {
+      chartType: "line",
+    });
 
     const plugins = [...(showChartLegend ? [htmlLegendPlugin] : [])];
 
@@ -306,96 +227,16 @@ function LineChart({
           plugins: {
             tooltip: {
               enabled: true,
-              bodyColor: tooltipBodyColor.light,
-              backgroundColor: tooltipBgColor.light,
-              borderColor: tooltipBorderColor.light,
-              borderWidth: 1,
               mode: "index",
               intersect: false,
-              callbacks: {
-                title: () => "",
-                beforeBody: (tooltipItems) => {
-                  if (tooltipMode === "label") {
-                    const item = tooltipItems[0];
-                    const labels = item?.chart?.data?.labels;
-                    if (labels && typeof item?.dataIndex === "number") {
-                      return [String(labels[item.dataIndex])];
-                    }
-                    if (typeof item?.label === "string") return [item.label];
-                    if (typeof item?.parsed?.x === "string")
-                      return [item.parsed.x];
-                    return [""];
-                  } else {
-                    let date = null;
-                    const value = tooltipItems[0].parsed.x;
-                    if (typeof value === "string") {
-                      date = parseISO(value);
-                    } else if (typeof value === "number") {
-                      date = new Date(value);
-                    }
-                    if (!date || isNaN(date.getTime())) return [String(value)];
-                    if (view === "weekly") {
-                      return [
-                        `Week ${getISOWeek(date)}, ${format(date, "yyyy")}`,
-                      ];
-                    }
-                    if (view === "monthly") {
-                      return [format(date, "MMM yyyy")];
-                    }
-                    return [format(date, "dd-MM-yyyy")];
-                  }
-                },
-                label: (context) => {
-                  const datasetLabel = context.dataset.label || "";
-                  const value = formatValue(context.parsed.y);
-
-                  if (percent) {
-                    // In percentage mode, show both percentage and original value
-                    const originalDataPoint =
-                      data.datasets[context.datasetIndex!].data[
-                        context.dataIndex!
-                      ];
-                    let originalValue;
-
-                    // Handle both number and {x, y} object formats (same logic as useOptimizedCardData)
-                    if (
-                      originalDataPoint &&
-                      typeof originalDataPoint === "object" &&
-                      "y" in originalDataPoint
-                    ) {
-                      originalValue = originalDataPoint.y;
-                    } else if (typeof originalDataPoint === "number") {
-                      originalValue = originalDataPoint;
-                    } else {
-                      originalValue = 0;
-                    }
-
-                    // Remove $ sign from percentage value
-                    const percentageValue = value.replace("$", "");
-                    return `${datasetLabel}: ${percentageValue}% (${formatValue(
-                      originalValue
-                    )})`;
-                  }
-
-                  return `${datasetLabel}: ${value}`;
-                },
-                afterBody: (tooltipItems) => {
-                  const total = tooltipItems.reduce(
-                    (sum, item) => sum + item.parsed.y,
-                    0
-                  );
-
-                  if (percent) {
-                    // In percentage mode, show total as percentage without $ sign
-                    const totalValue = formatValue(total).replace("$", "");
-                    return [`Total: ${totalValue}%`];
-                  }
-
-                  return [`Total: ${formatValue(total)}`];
-                },
-              },
+              callbacks: createLineChartTooltipCallbacks({
+                percent,
+                tooltipMode,
+                view,
+                originalData: data,
+              }),
               displayColors: true,
-              bodySpacing: 4,
+              ...getChartTooltipColors(chartColors),
             },
             legend: {
               display: false, // Always disable Chart.js legend for line charts
@@ -433,9 +274,7 @@ function LineChart({
     };
   }, [
     dataHash,
-    tooltipBodyColor,
-    tooltipBgColor,
-    tooltipBorderColor,
+    chartColors,
     showChartLegend,
     showChartGridlineX,
     showChartGridlineY,

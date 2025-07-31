@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import CandaIcon from "../assets/images/canda_icon.png";
 
 function Header() {
   const [isRainbow, setIsRainbow] = useState(false);
+  const location = useLocation();
 
   // Check if we should start animation on page load
   useEffect(() => {
@@ -37,10 +39,10 @@ function Header() {
           }
         `}
       </style>
-      <div className="flex items-center justify-between -mt-5 px-2 pb-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-8 py-3 gap-3 sm:gap-0">
         <div className="flex items-center gap-3">
           <img
-            className={`w-13 h-12 cursor-pointer transition-all duration-1000 ease-in-out ${
+            className={`w-10 h-9 sm:w-13 sm:h-12 cursor-pointer transition-all duration-1000 ease-in-out ${
               isRainbow
                 ? "animate-pulse ring-2 ring-teal-400 ring-opacity-50 rounded-full"
                 : ""
@@ -50,49 +52,77 @@ function Header() {
             alt="Canda"
             onClick={handleIconClick}
           />
-          <h1 className="text-xl font-semibold text-oxford-blue-900">
-            Brand Dashboard
+          <h1 className="text-lg sm:text-xl font-semibold text-oxford-blue-900 min-w-[150px] sm:min-w-[200px]">
+            {location.pathname === "/dashboard"
+              ? "Brand Analysis"
+              : location.pathname === "/dashboard/competitive"
+              ? "Competitive Analysis"
+              : location.pathname === "/dashboard/category"
+              ? "Category Analysis"
+              : "Brand Analysis"}
           </h1>
         </div>
 
-        {/* View toggle buttons 
-        <div className="flex items-center gap-2">
-          <a
-            href=""
-            className="flex items-center justify-center w-10 h-10 rounded-lg border transition-colors bg-teal-100 border-teal-300 text-teal-700"
-            title="Brand Dashboard"
+        {/* View toggle buttons */}
+        <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-[160px] justify-center">
+          <NavLink
+            to="/dashboard"
+            end
+            className={({ isActive }) =>
+              `flex items-center justify-center w-9 h-8 sm:w-11 sm:h-10 rounded-lg border transition-colors ${
+                isActive
+                  ? "bg-teal-600 border-teal-100 text-frost-gray-50"
+                  : "bg-white border-gray-200 text-gray-600 hover:bg-teal-50 hover:text-teal-800"
+              }`
+            }
+            title="Brand Analysis"
           >
-            <span className="material-symbols-outlined msolarge text-lg">
+            <span className="material-symbols-outlined msolarge text-base sm:text-lg">
               person
             </span>
-          </a>
+          </NavLink>
 
-          <a
-            href=""
-            className="flex items-center justify-center w-10 h-10 rounded-lg border transition-colors bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+          <NavLink
+            to="/dashboard/competitive"
+            className={({ isActive }) =>
+              `flex items-center justify-center w-9 h-8 sm:w-11 sm:h-10 rounded-lg border transition-colors ${
+                isActive
+                  ? "bg-teal-600 border-teal-100 text-frost-gray-50"
+                  : "bg-white border-gray-200 text-gray-600 hover:bg-teal-50 hover:text-teal-800"
+              }`
+            }
             title="Competitive Dashboard"
           >
-            <span className="material-symbols-outlined msolarge text-lg">
+            <span className="material-symbols-outlined msolarge text-base sm:text-lg">
               group
             </span>
-          </a>
+          </NavLink>
 
-          <a
-            href=""
-            className="flex items-center justify-center w-10 h-10 rounded-lg border transition-colors bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+          <NavLink
+            to="/dashboard/category"
+            className={({ isActive }) =>
+              `flex items-center justify-center w-9 h-8 sm:w-11 sm:h-10 rounded-lg border transition-colors ${
+                isActive
+                  ? "bg-teal-600 border-teal-100 text-frost-gray-50"
+                  : "bg-white border-gray-200 text-gray-600 hover:bg-teal-50 hover:text-teal-800"
+              }`
+            }
             title="Category Dashboard"
           >
-            <span className="material-symbols-outlined msolarge text-lg">
+            <span className="material-symbols-outlined msolarge text-base sm:text-lg">
               category
             </span>
-          </a>
-        </div> */}
+          </NavLink>
+        </div>
 
-        <div className="flex headerbtn items-center px-2.5 gap-1 bg-white border border-frost-gray-200 text-frost-gray-900 hover:text-teal-800 hover:bg-teal-50 rounded-md h-9 cursor-pointer w-fit">
-          <span className="material-symbols-outlined text-base leading-none">
+        <div className="flex headerbtn items-center px-2 gap-1 bg-white border border-frost-gray-200 text-frost-gray-900 hover:text-teal-800 hover:bg-teal-50 rounded-md h-8 sm:h-9 cursor-pointer w-full sm:w-[235px] justify-center text-xs sm:text-sm">
+          <span className="material-symbols-outlined text-sm sm:text-base leading-none">
             calendar_month
           </span>
-          <span className="text-sm font-medium leading-none">
+          <span className="font-medium leading-none hidden xs:block">
+            Jan 01, 2025 – Jun 30,2025
+          </span>
+          <span className="font-medium leading-none xs:hidden">
             Jan 01, 2025 – Jun 30,2025
           </span>
         </div>

@@ -22,9 +22,9 @@ const LinkButton = memo(
     if (loading) {
       return (
         <div
-          className={`inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg border transition-colors bg-white border-frost-gray-200 text-frost-gray-900 hover:bg-teal-50 hover:text-teal-800 ${className}`}
+          className={`inline-flex items-center justify-center gap-1 ${className}`}
         >
-          <LoadingBlock size="custom" height="h-7" width="w-24" />
+          <LoadingBlock size="md" />
         </div>
       );
     }
